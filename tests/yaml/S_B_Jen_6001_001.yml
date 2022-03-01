@@ -1,0 +1,25 @@
+pipelines: # Two separate steps to configure different timeouts
+  - name: S_B_Jen_6001_001_1
+    steps:
+      - name: S_B_Jen_6001_001_1
+        type: Jenkins
+        configuration:
+          timeoutSeconds: 1200
+          priority: 900
+          jenkinsJobName: testFolder/singlebranch
+          buildParameters:
+            waitTime: 1200
+          integrations:
+            - name: S_B_Jenkins
+
+  - name: S_B_Jen_6001_001_2
+    steps:
+      - name: S_B_Jen_6001_001_2
+        type: Jenkins
+        configuration:
+          timeoutSeconds: 60
+          jenkinsJobName: testFolder/singlebranch
+          buildParameters:
+            waitTime: 600
+          integrations:
+            - name: S_B_Jenkins
