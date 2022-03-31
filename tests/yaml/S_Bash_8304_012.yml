@@ -1,0 +1,28 @@
+resources:
+  - name: S_Bash_8304_012_FileSpec
+    type: FileSpec
+    configuration:
+      sourceArtifactory: s_artifactory
+      pattern: "test-automation-generic-local/fileSpecBash/s_foo"
+      limit: 1
+      excludePatterns:
+        - "test-automation-generic-local/fileSpecBash/pipeInfo.json"
+
+pipelines:
+  - name: pipelines_S_Bash_8304_012
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_Bash_8304_012
+        type: Bash
+        configuration:
+          inputResources:
+            - name: S_Bash_8304_012_FileSpec
+        execution:
+          onExecute:
+            - echo "executing step"
+            - pushd $res_S_Bash_8304_012_FileSpec_resourcePath
+            - if [ -f "./fileSpecBash/s_foo" ]; then echo "found the file"; fi
+            - if [ -f "./fileSpecBash/pipeInfo.json" ]; then echo "wrong file found"; exit 1; fi
+            - if [ ! -f "./fileSpecBash/s_foo" ]; then echo "error finding the file"; exit 1; fi
+            - popd

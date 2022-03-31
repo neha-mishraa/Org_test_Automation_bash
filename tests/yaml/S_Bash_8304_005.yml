@@ -1,0 +1,24 @@
+resources:
+  - name: S_Bash_8304_005_FileSpec
+    type: FileSpec
+    configuration:
+      sourceArtifactory: s_artifactory
+      pattern: "test-automation-generic-local/fileSpecBash/random/*"
+      recursive: false
+      excludePatterns:
+        - "*.ps1"
+
+pipelines:
+  - name: pipelines_S_Bash_8304_005
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_Bash_8304_005
+        type: Bash
+        configuration:
+          inputResources:
+            - name: S_Bash_8304_005_FileSpec
+        execution:
+          onExecute:
+            - echo "executing step..."
+            - ls

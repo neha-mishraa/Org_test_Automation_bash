@@ -1,0 +1,65 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_NpmPublish_8304_006_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+  - name: S_NpmPublish_8304_006_buildInfo
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: s_artifactory
+
+pipelines:
+  - name: S_NpmPublish_8304_006
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_NpmPublish_8304_006_1
+        type: NpmBuild
+        configuration:
+          environmentVariables:
+            JFROG_CLI_BUILD_NUMBER: ${run_id}
+          affinityGroup: S_NpmPublish_8304_006
+          sourceLocation: "tests/npm"
+          resolverRepo: "test-automation-npm-remote"
+          integrations:
+            - name: s_artifactory
+          inputResources:
+            - name: S_NpmPublish_8304_006_GitRepo
+        execution:
+          onStart:
+            - replace_envs ${res_S_NpmPublish_8304_006_GitRepo_resourcePath}/tests/npm/package.json
+      - name: S_NpmPublish_8304_006_2
+        type: NpmPublish
+        execution:
+          onStart:
+            - add_run_variables buildName=${JFROG_CLI_BUILD_NAME} buildNumber=${JFROG_CLI_BUILD_NUMBER}
+        configuration:
+          affinityGroup: S_NpmPublish_8304_006
+          autoPublishBuildInfo: true
+          deployerRepo: "test-automation-npm-local"
+          forceXrayScan: true
+          integrations:
+            - name: s_artifactory
+          inputSteps:
+            - name: S_NpmPublish_8304_006_1
+          outputResources:
+            - name: S_NpmPublish_8304_006_buildInfo
+      - name: S_NpmPublish_8304_006_3
+        type: Bash
+        configuration:
+          affinityGroup: S_NpmPublish_8304_006
+          inputResources:
+            - name: S_NpmPublish_8304_006_buildInfo
+          inputSteps:
+            - name: S_NpmPublish_8304_006_2
+          integrations:
+            - name: s_artifactory
+        execution:
+          onExecute:
+            - jfrog rt curl -XDELETE "/api/build/${res_S_NpmPublish_8304_006_buildInfo_buildName}?buildNumbers=${res_S_NpmPublish_8304_006_buildInfo_buildNumber}&artifacts=1"

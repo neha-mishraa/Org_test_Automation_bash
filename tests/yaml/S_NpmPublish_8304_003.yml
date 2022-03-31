@@ -1,0 +1,39 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_NpmPublish_8304_003_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+pipelines:
+  - name: pipeline_S_NpmPublish_8304_003
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_NpmPublish_8304_003_1
+        type: NpmBuild
+        configuration:
+          inputResources:
+            - name: S_NpmPublish_8304_003_GitRepo
+          integrations:
+            - name: s_artifactory
+          sourceLocation: "tests/npm"
+          repositoryName: test-automation-npm-remote
+        execution:
+          onStart:
+            - replace_envs ${res_S_NpmPublish_8304_003_GitRepo_resourcePath}/tests/npm/package.json
+      - name: S_NpmPublish_8304_003_2
+        type: NpmPublish
+        configuration:
+          environmentVariables:
+            repo: "test-automation-npm-local"
+          deployerRepo: ${repo}
+          inputSteps:
+            - name: S_NpmPublish_8304_003_1
+          integrations:
+            - name: s_artifactory
