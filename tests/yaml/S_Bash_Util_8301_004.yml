@@ -1,0 +1,8 @@
+pipelines:
+  - name: pipeline_S_Bash_Util_8301_004
+    steps:
+      - name: S_Bash_Util_8301_004_step
+        type: Bash
+        execution:
+          onExecute:
+            - set_trigger_payload pipelineVariables

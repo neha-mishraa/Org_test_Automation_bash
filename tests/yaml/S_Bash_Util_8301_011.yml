@@ -1,0 +1,9 @@
+pipelines:
+  - name: pipeline_S_Bash_Util_8301_011
+    steps:
+      - name: S_Bash_Util_8301_011_step
+        type: Bash
+        execution:
+          onExecute:
+            - payload_path="$(check_default_trigger_payload)"
+            - if [ "$payload_path" != "$step_tmp_dir/triggerPayload.json" ]; then exit 1; fi
