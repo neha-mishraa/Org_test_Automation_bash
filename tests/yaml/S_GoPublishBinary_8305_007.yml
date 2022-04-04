@@ -1,0 +1,66 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_GoPublishBinary_8305_007_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+  - name: S_GoPublishBinary_8305_007_buildInfo
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: s_artifactory
+
+pipelines:
+  - name: S_GoPublishBinary_8305_007
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_GoPublishBinary_8305_007_1
+        type: GoBuild
+        execution:
+          onStart:
+            - add_run_variables buildName=${JFROG_CLI_BUILD_NAME} buildNumber=${JFROG_CLI_BUILD_NUMBER}
+        configuration:
+          affinityGroup: S_GoPublishBinary_8305_007
+          environmentVariables:
+              JFROG_CLI_BUILD_NUMBER: ${run_id}
+          sourceLocation: "tests/Go/HelloWorld"
+          resolverRepo: test-automation-go-virtual
+          integrations:
+            - name: s_artifactory
+          inputResources:
+            - name: S_GoPublishBinary_8305_007_GitRepo
+      - name: S_GoPublishBinary_8305_007_2
+        type: GoPublishBinary
+        execution:
+          onStart:
+            - add_run_variables buildName=${JFROG_CLI_BUILD_NAME} buildNumber=${JFROG_CLI_BUILD_NUMBER}
+        configuration:
+          affinityGroup: S_GoPublishBinary_8305_007
+          environmentVariables:
+            JFROG_CLI_BUILD_NUMBER: ${run_id}
+          integrations:
+            - name: s_artifactory
+          autoPublishBuildInfo: true
+          forceXrayScan: true
+          inputSteps:
+            - name: S_GoPublishBinary_8305_007_1
+          targetRepository: test-automation-go-local
+          outputResources:
+            - name: S_GoPublishBinary_8305_007_buildInfo
+      - name: S_GoPublishBinary_8305_007_3
+        type: Bash
+        configuration:
+          inputResources:
+            - name: S_GoPublishBinary_8305_007_buildInfo
+          inputSteps:
+            - name: S_GoPublishBinary_8305_007_2
+          integrations:
+            - name: s_artifactory
+        execution:
+          onExecute:
+            - jfrog rt curl -XDELETE "/api/build/${res_S_GoPublishBinary_8305_007_buildInfo_buildName}?buildNumbers=${res_S_GoPublishBinary_8305_007_buildInfo_buildNumber}&artifacts=1"

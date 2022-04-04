@@ -30,5 +30,5 @@ pipelines:
             - name: s_artifactory
           inputResources:
             - name: S_GoPublishModule_5933_004_GitRepo_2
-          version: "v0.0.${run_number}"
+          version: "v0.59334.${run_number}"
           targetRepository: test-automation-go-local

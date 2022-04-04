@@ -1,0 +1,39 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_GoBuild_8305_009_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+pipelines:
+  - name: pipeline_S_GoBuild_8305_009
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_GoBuild_8305_009_1
+        type: GoBuild
+        configuration:
+          inputResources:
+            - name: S_GoBuild_8305_009_GitRepo
+          integrations:
+            - name: s_artifactory
+          sourceLocation: "tests/Go/HelloWorld"
+          resolverRepo: test-automation-go-virtual
+          outputLocation: "./output"
+          goCommand: "build -o ./output/myFile"
+        execution:
+          onSuccess:
+            - if [ ! -f "$(find_resource_variable $inputGitRepoResourceName resourcePath)/$(find_step_configuration_value sourceLocation)/output/myFile" ]; then echo "TEST FAILED"; add_run_variables TEST_FAILED=true; return 1; fi
+      - name: S_GoBuild_8305_009_2
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: S_GoBuild_8305_009_1
+        execution:
+          onExecute:
+            - if [ "$TEST_FAILED" == "true" ]; then return 1; fi

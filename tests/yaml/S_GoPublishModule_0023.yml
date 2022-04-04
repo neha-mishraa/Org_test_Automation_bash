@@ -25,7 +25,7 @@ pipelines:
             - name: S_GoPublishModule_0023_GitRepo
           outputResources:
             - name: S_GoPublishModule_0023_BuildInfo
-          version: "v0.0.${run_number}"
+          version: "v0.23.${run_number}"
           targetRepository: test-automation-go-local
           autoPublishBuildInfo: true
           forceXrayScan: true
