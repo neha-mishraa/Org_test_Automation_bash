@@ -1,0 +1,11 @@
+pipelines:
+  - name: pipeline_S_Bash_Util_8301_012
+    steps:
+      - name: S_Bash_Util_8301_012_step
+        type: Bash
+        execution:
+          onExecute:
+            - default_payload='{"injectedPipeEnvs":[],"injectedStepEnvs":[]}'
+            - payload_path="$(check_default_trigger_payload)"
+            - payload_to_check="$(cat $payload_path)"
+            - if [ "$default_payload" != "$payload_to_check" ]; then exit 1; fi

@@ -1,0 +1,10 @@
+pipelines:
+  - name: pipeline_S_Bash_Util_8301_010
+    steps:
+      - name: S_Bash_Util_8301_010_step
+        type: Bash
+        execution:
+          onExecute:
+            - set_trigger_payload pipelineVariables "abc=abcvalue" "def=defvalue"
+            - if [ "abcvalue" != "$(get_trigger_payload | jq '.injectedPipeEnvs[0].value)" ]; then exit 1; fi
+            - if [ "defvalue" != "$(get_trigger_payload | jq '.injectedPipeEnvs[1].value)" ]; then exit 1; fi
