@@ -9,6 +9,6 @@ pipelines:
             - payload_path="$(check_default_trigger_payload)"
             - set_trigger_payload stepVariables "abc=abcvalue"
             - set_trigger_payload pipelineVariables "def=defvalue"
-            - check_default_trigger_payload --reset
-            - payload_to_check="cat $payload_path"
+            - result="$(check_default_trigger_payload --reset)"
+            - payload_to_check="$(cat $payload_path)"
             - if [ "$default_payload" != "$payload_to_check" ]; then exit 1; fi
