@@ -1,0 +1,26 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_Bash_Util_7133_0002_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+pipelines:
+  - name: S_Bash_Util_7133_0002
+    steps:
+      - name: S_Bash_Util_7133_0002_1
+        type: Bash
+        configuration:
+          inputResources:
+            - name: S_Bash_Util_7133_0002_GitRepo
+        execution:
+          onExecute:
+            - pushd ${res_S_Bash_Util_7133_0002_GitRepo_resourcePath}/tests/scripts
+            - ./utility.sh
+            - popd
+
