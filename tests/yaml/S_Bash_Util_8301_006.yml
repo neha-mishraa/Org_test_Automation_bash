@@ -6,4 +6,5 @@ pipelines:
         execution:
           onExecute:
             - set_trigger_payload stepVariables "abc=abcvalue"
-            - if [ "abcvalue" != "$(get_trigger_payload | jq '.injectedStepEnvs[0].value)" ]; then exit 1; fi
+            - value="$(get_trigger_payload | jq -r '.injectedStepEnvs[0].value')"
+            - if [ "abcvalue" != "$(get_trigger_payload | jq -r '.injectedStepEnvs[0].value')" ]; then exit 1; fi
