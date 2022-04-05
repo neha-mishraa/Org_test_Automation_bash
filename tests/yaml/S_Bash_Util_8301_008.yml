@@ -5,5 +5,5 @@ pipelines:
         type: Bash
         execution:
           onExecute:
-            - default_payload='{"injectedPipeEnvs":[],"injectedStepEnvs":[]}'
+            - default_payload='{"injectedPipeEnvs":[],"injectedEnvs":[]}'
             - if [ "$default_payload" != "$(get_trigger_payload)" ]; then exit 1; fi

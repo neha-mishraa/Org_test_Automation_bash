@@ -5,7 +5,7 @@ pipelines:
         type: Bash
         execution:
           onExecute:
-            - default_payload='{"injectedPipeEnvs":[],"injectedStepEnvs":[]}'
+            - default_payload='{"injectedPipeEnvs":[],"injectedEnvs":[]}'
             - payload_path="$(check_default_trigger_payload)"
             - rm $payload_path
             - touch $payload_path
