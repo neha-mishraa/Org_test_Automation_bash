@@ -4,7 +4,7 @@ pipelines:
       - name: S_B_Jen_0044_1
         type: Jenkins
         configuration:
-          timeoutSeconds: 2
+          timeoutSeconds: 60
           jenkinsJobName: testFolder/multibranch
           jenkinsBranchName: {{gitBranch}}
           buildParameters:
