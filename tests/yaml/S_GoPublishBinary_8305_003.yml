@@ -1,0 +1,47 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_GoPublishBinary_8305_003_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+pipelines:
+  - name: pipeline_S_GoPublishBinary_8305_003
+    configuration:
+      jfrogCliVersion: 2
+      environmentVariables:
+        readOnly:
+          target: test-automation-go-local
+    steps:
+      - name: S_GoPublishBinary_8305_003_1
+        type: GoBuild
+        configuration:
+          inputResources:
+            - name: S_GoPublishBinary_8305_003_GitRepo
+          integrations:
+            - name: s_artifactory
+          sourceLocation: "tests/Go/HelloWorld"
+          resolverRepo: test-automation-go-virtual
+      - name: S_GoPublishBinary_8305_003_2
+        type: GoPublishBinary
+        configuration:
+          inputSteps:
+            - name: S_GoPublishBinary_8305_003_1
+          integrations:
+            - name: s_artifactory
+          targetRepository: "${target}"
+      - name: S_GoPublishBinary_8305_003_3
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: S_GoPublishBinary_8305_003_2
+          integrations:
+            - name: s_artifactory
+        execution:
+          onExecute:
+            - jfrog rt download --fail-no-op --insecure-tls=${no_verify_ssl} --limit=1 "test-automation-go-local/S_GoPublishBinary_8305_003_1"

@@ -1,0 +1,30 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_GoPublishModule_8305_006_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+pipelines:
+  - name: pipeline_S_GoPublishModule_8305_006
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_GoPublishModule_8305_006_1
+        type: GoPublishModule
+        configuration:
+          environmentVariables:
+            include_self: "true"
+          inputResources:
+            - name: S_GoPublishModule_8305_006_GitRepo
+          integrations:
+            - name: s_artifactory
+          version: "v0.83056.${run_number}"
+          targetRepository: "test-automation-go-local"
+          sourceLocation: "tests/Go"
+          self: ${include_self}

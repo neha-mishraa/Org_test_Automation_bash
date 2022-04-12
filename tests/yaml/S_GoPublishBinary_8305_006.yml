@@ -1,0 +1,60 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_GoPublishBinary_8305_006_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+  - name: S_GoPublishBinary_8305_006_BuildInfo
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: s_artifactory
+
+pipelines:
+  - name: pipeline_S_GoPublishBinary_8305_006
+    configuration:
+      jfrogCliVersion: 2
+      environmentVariables:
+        readOnly:
+          myEnvironmentVariable: "test"
+    steps:
+      - name: S_GoPublishBinary_8305_006_1
+        type: GoBuild
+        configuration:
+          inputResources:
+            - name: S_GoPublishBinary_8305_006_GitRepo
+          integrations:
+            - name: s_artifactory
+          sourceLocation: "tests/Go/HelloWorld"
+          resolverRepo: test-automation-go-virtual
+        execution:
+          onStart:
+            - add_run_variables JFROG_CLI_ENV_EXCLUDE="*myenvironmentvariable*;*password*;*secret*;*key*;*token*"
+      - name: S_GoPublishBinary_8305_006_2
+        type: GoPublishBinary
+        configuration:
+          inputSteps:
+            - name: S_GoPublishBinary_8305_006_1
+          outputResources:
+            - name: S_GoPublishBinary_8305_006_BuildInfo
+          targetRepository: test-automation-go-local
+          autoPublishBuildInfo: true
+      - name: S_GoPublishBinary_8305_006_3
+        type: Bash
+        configuration:
+          integrations:
+            - name: s_artifactory
+          inputResources:
+            - name: S_GoPublishBinary_8305_006_BuildInfo
+        execution:
+          onExecute:
+            - jfrog rt curl -XGET /api/build/${JFROG_CLI_BUILD_NAME}/${JFROG_CLI_BUILD_NUMBER} -o ${step_tmp_dir}/response
+            - jfrog rt curl -XDELETE /api/build/${JFROG_CLI_BUILD_NAME}?buildNumbers=${JFROG_CLI_BUILD_NUMBER}&artifacts=1
+            - cat ${step_tmp_dir}/response
+            - myVariable=$(cat ${step_tmp_dir}/response | jq -r '.buildInfo.properties["buildInfo.env.myEnvironmentVariable"]')
+            - if [ "$myVariable" != "null" ] ; then return 1; fi

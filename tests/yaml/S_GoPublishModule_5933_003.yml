@@ -21,5 +21,5 @@ pipelines:
         configuration:
           integrations:
             - name: s_artifactory
-          version: "v0.0.${run_number}"
+          version: "v0.59333.${run_number}"
           targetRepository: test-automation-go-local

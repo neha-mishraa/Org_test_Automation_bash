@@ -1,0 +1,34 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_GoPublishBinary_8305_001_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+pipelines:
+  - name: pipeline_S_GoPublishBinary_8305_001
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_GoPublishBinary_8305_001_1
+        type: GoBuild
+        configuration:
+          inputResources:
+            - name: S_GoPublishBinary_8305_001_GitRepo
+          integrations:
+            - name: s_artifactory
+          sourceLocation: "tests/Go/HelloWorld"
+          resolverRepo: test-automation-go-virtual
+      - name: S_GoPublishBinary_8305_001_2
+        type: GoPublishBinary
+        configuration:
+          inputSteps:
+            - name: S_GoPublishBinary_8305_001_1
+          integrations:
+            - name: s_artifactory
+          targetRepository: test-automation-go-local
