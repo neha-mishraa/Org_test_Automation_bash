@@ -1,0 +1,27 @@
+resources:
+  - name: S_Bash_Generic_5775_0006_resource
+    type: PropertyBag
+    configuration:
+      foo: "bar"
+
+pipelines:
+  - name: S_Bash_Generic_5775_0006
+    steps:
+      - name: S_Bash_Generic_5775_0006_1
+        type: Bash
+        configuration:
+          outputResources:
+            - name: S_Bash_Generic_5775_0006_resource
+        execution:
+          onExecute:
+            - write_output S_Bash_Generic_5775_0006_resource run=${run_id}
+      - name: S_Bash_Generic_5775_0006_2
+        type: Bash
+        configuration:
+          inputResources:
+            - name: S_Bash_Generic_5775_0006_resource
+          inputSteps:
+            - name: S_Bash_Generic_5775_0006_1
+        execution:
+          onExecute:
+            - echo hello
