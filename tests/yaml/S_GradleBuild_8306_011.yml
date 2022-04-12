@@ -1,0 +1,30 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_GradleBuild_8306_011_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+pipelines:
+  - name: pipeline_S_GradleBuild_8306_011
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_GradleBuild_8306_011
+        type: GradleBuild
+        configuration:
+          environmentVariables:
+            my_command: "-q hello"
+          inputResources:
+            - name: S_GradleBuild_8306_011_GitRepo
+          integrations:
+            - name: s_artifactory
+          resolverRepo: "test-automation-gradle-remote"
+          deployerRepo: "test-automation-gradle-local"
+          sourceLocation: "tests/gradle"
+          gradleCommand: "${my_command}"

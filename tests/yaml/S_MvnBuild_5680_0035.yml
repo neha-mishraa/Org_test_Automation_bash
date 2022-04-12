@@ -1,0 +1,54 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_MvnBuild_5680_0035_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+  - name: S_MvnBuild_5680_0035_BuildInfo
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: s_artifactory
+
+pipelines:
+  - name: pipeline_S_MvnBuild_5680_0035
+    steps:
+      - name: S_MvnBuild_5680_0035_1
+        type: MvnBuild
+        configuration:
+          inputResources:
+            - name: S_MvnBuild_5680_0035_GitRepo
+          outputResources:
+            - name: S_MvnBuild_5680_0035_BuildInfo
+          integrations:
+            - name: s_artifactory
+          autoPublishBuildInfo: true
+          sourceLocation: "tests/mvn"
+          resolverSnapshotRepo: test-automation-mvn-remote
+          resolverReleaseRepo: test-automation-mvn-remote
+          deployerSnapshotRepo: test-automation-mvn-local
+          deployerReleaseRepo: test-automation-mvn-local
+
+      - name: S_MvnBuild_5680_0035_2
+        type: Bash
+        configuration:
+          inputResources:
+            - name: S_MvnBuild_5680_0035_BuildInfo
+          integrations:
+            - name: s_artifactory
+        execution:
+          onExecute:
+            - jfrog rt curl -XGET /api/build/${JFROG_CLI_BUILD_NAME}/${JFROG_CLI_BUILD_NUMBER} -o ${step_tmp_dir}/response
+            - jfrog rt curl -XDELETE /api/build/${JFROG_CLI_BUILD_NAME}?buildNumbers=${JFROG_CLI_BUILD_NUMBER}&artifacts=1
+            - if [ "$res_S_MvnBuild_5680_0035_BuildInfo_buildName" != "${JFROG_CLI_BUILD_NAME}" ] ; then return 1; fi
+            - if [ "$res_S_MvnBuild_5680_0035_BuildInfo_buildNumber" != "${JFROG_CLI_BUILD_NUMBER}" ] ; then return 1; fi
+            - cat ${step_tmp_dir}/response
+            - excludedVariable=$(cat ${step_tmp_dir}/response | jq -r '.buildInfo.properties["buildInfo.env.int_s_artifactory_apikey"]')
+            - if [ "$excludedVariable" != "null" ] ; then return 1; fi
+            - excludedVariable=$(cat ${step_tmp_dir}/response | jq -r '.buildInfo.properties["buildInfo.env.builder_api_token"]')
+            - if [ "$excludedVariable" != "null" ] ; then return 1; fi

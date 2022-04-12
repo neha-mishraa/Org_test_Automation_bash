@@ -1,0 +1,55 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_GradleBuild_8306_012_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+  - name: S_GradleBuild_8306_012_BuildInfo
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: s_artifactory
+
+pipelines:
+  - name: pipeline_S_GradleBuild_8306_012
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_GradleBuild_8306_012_1
+        type: GradleBuild
+        configuration:
+          inputResources:
+            - name: S_GradleBuild_8306_012_GitRepo
+          outputResources:
+            - name: S_GradleBuild_8306_012_BuildInfo
+          integrations:
+            - name: s_artifactory
+          autoPublishBuildInfo: true
+          resolverRepo: "test-automation-gradle-remote"
+          deployerRepo: "test-automation-gradle-local"
+          sourceLocation: "tests/gradle"
+          gradleCommand: "hello"
+
+      - name: S_GradleBuild_8306_012_2
+        type: Bash
+        configuration:
+          inputResources:
+            - name: S_GradleBuild_8306_012_BuildInfo
+          integrations:
+            - name: s_artifactory
+        execution:
+          onExecute:
+            - jfrog rt curl -XGET /api/build/${JFROG_CLI_BUILD_NAME}/${JFROG_CLI_BUILD_NUMBER} -o ${step_tmp_dir}/response
+            - jfrog rt curl -XDELETE /api/build/${JFROG_CLI_BUILD_NAME}?buildNumbers=${JFROG_CLI_BUILD_NUMBER}&artifacts=1
+            - if [ "$res_S_GradleBuild_8306_012_BuildInfo_buildName" != "${JFROG_CLI_BUILD_NAME}" ] ; then return 1; fi
+            - if [ "$res_S_GradleBuild_8306_012_BuildInfo_buildNumber" != "${JFROG_CLI_BUILD_NUMBER}" ] ; then return 1; fi
+            - cat ${step_tmp_dir}/response
+            - excludedVariable=$(cat ${step_tmp_dir}/response | jq -r '.buildInfo.properties["buildInfo.env.int_s_artifactory_apikey"]')
+            - if [ "$excludedVariable" != "null" ] ; then return 1; fi
+            - excludedVariable=$(cat ${step_tmp_dir}/response | jq -r '.buildInfo.properties["buildInfo.env.builder_api_token"]')
+            - if [ "$excludedVariable" != "null" ] ; then return 1; fi

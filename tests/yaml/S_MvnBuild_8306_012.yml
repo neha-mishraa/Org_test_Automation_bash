@@ -1,0 +1,47 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_MvnBuild_8306_012_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+pipelines:
+  - name: pipeline_S_MvnBuild_8306_012
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_MvnBuild_8306_012_1
+        type: MvnBuild
+        configuration:
+          inputResources:
+            - name: S_MvnBuild_8306_012_GitRepo
+          integrations:
+            - name: s_artifactory
+          sourceLocation: "tests/mvn"
+          resolverSnapshotRepo: test-automation-mvn-remote
+          resolverReleaseRepo: test-automation-mvn-remote
+          deployerSnapshotRepo: test-automation-mvn-local
+          deployerReleaseRepo: test-automation-mvn-local
+
+      - name: S_MvnBuild_8306_012_2
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: S_MvnBuild_8306_012_1
+          integrations:
+            - name: s_artifactory
+        execution:
+          onExecute:
+            - if [ "${buildStepName}" != "S_MvnBuild_8306_012_1" ]; then return 1; fi
+            - if [ "${S_MvnBuild_8306_012_1_payloadType}" != "mvn" ]; then return 1; fi
+            - if [ "${S_MvnBuild_8306_012_1_buildNumber}" != "${JFROG_CLI_BUILD_NUMBER}" ]; then return 1; fi
+            - if [ "${S_MvnBuild_8306_012_1_buildName}" != "${JFROG_CLI_BUILD_NAME}" ]; then return 1; fi
+            - if [ "${S_MvnBuild_8306_012_1_isPromoted}" != "false" ]; then return 1; fi
+            - restore_run_files jfrog jfrog
+            - ls jfrog
+            - if [ ! -d "jfrog/builds" ]; then return 1; fi

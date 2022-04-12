@@ -1,0 +1,42 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_MvnBuild_5680_0033_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+pipelines:
+  - name: pipeline_S_MvnBuild_5680_0033
+    steps:
+      - name: S_MvnBuild_5680_0033_1
+        type: MvnBuild
+        configuration:
+          inputResources:
+            - name: S_MvnBuild_5680_0033_GitRepo
+          integrations:
+            - name: s_artifactory
+          sourceLocation: "tests/mvn"
+          mvnCommand: "clean test"
+          resolverSnapshotRepo: test-automation-mvn-remote
+          resolverReleaseRepo: test-automation-mvn-remote
+          deployerSnapshotRepo: test-automation-mvn-local
+          deployerReleaseRepo: test-automation-mvn-local
+        execution:
+          onSuccess:
+            - pushd $(find_resource_variable $inputGitRepoResourceName resourcePath)/tests/mvn
+            - if [ -f "target/maventest-2.17-SNAPSHOT.jar" ]; then echo "TEST FAILED"; return 1; fi
+            - if [ ! -f "target/surefire-reports/TEST-artifactory.test.AppTest.xml" ]; then echo "TEST FAILED"; return 1; fi
+            - add_run_variables TEST_SUCCESS=true
+      - name: S_MvnBuild_5680_0033_2
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: S_MvnBuild_5680_0033_1
+        execution:
+          onExecute:
+            - if [ "$TEST_SUCCESS" != "true" ]; then return 1; fi

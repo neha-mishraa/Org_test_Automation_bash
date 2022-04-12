@@ -1,0 +1,46 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_MvnBuild_5680_0026_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+  - name: S_MvnBuild_5680_0026_FileSpec
+    type: FileSpec
+    configuration:
+      sourceArtifactory: s_artifactory
+      pattern: test-automation-generic-local/S_MvnBuild_5680_0026_Config
+
+
+pipelines:
+  - name: pipeline_S_MvnBuild_5680_0026
+    steps:
+      - name: S_MvnBuild_5680_0026_1
+        type: Bash
+        configuration:
+          integrations:
+            - name: s_artifactory
+          inputResources:
+            - name: S_MvnBuild_5680_0026_GitRepo
+          outputResources:
+            -  name: S_MvnBuild_5680_0026_FileSpec
+        execution:
+          onExecute:
+            - cd $(find_resource_variable S_MvnBuild_5680_0026_GitRepo resourcePath)/tests/mvn
+            - jfrog rt upload config test-automation-generic-local/S_MvnBuild_5680_0026_Config
+
+      - name: S_MvnBuild_5680_0026_2
+        type: MvnBuild
+        configuration:
+          inputResources:
+            - name: S_MvnBuild_5680_0026_GitRepo
+            - name: S_MvnBuild_5680_0026_FileSpec
+          integrations:
+            - name: s_artifactory
+          sourceLocation: tests/mvn
+          configFileName: S_MvnBuild_5680_0026_Config
+          configFileLocation: .
