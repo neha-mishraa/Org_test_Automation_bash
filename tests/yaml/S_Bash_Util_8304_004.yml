@@ -1,0 +1,17 @@
+pipelines:
+  - name: S_Bash_Util_8304_004
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_Bash_Util_8304_004
+        type: Bash
+        configuration:
+          integrations:
+            - name: s_artifactory
+        execution:
+          onExecute:
+            - configure_jfrog_cli --artifactory-url $int_s_artifactory_url --user $int_s_artifactory_user --apikey $int_s_artifactory_apikey --server-name test_config
+            - jfrog config edit test_config --xray-url "${int_s_artifactory_url%artifactory}/notxray"
+            - check_xray_available --server-name test_config
+          onComplete:
+            - cleanup_jfrog_cli --server-name test_config

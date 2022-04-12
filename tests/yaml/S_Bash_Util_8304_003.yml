@@ -1,0 +1,13 @@
+pipelines:
+  - name: S_Bash_Util_8304_003
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_Bash_Util_8304_003
+        type: Bash
+        configuration:
+          integrations:
+            - name: s_artifactory
+        execution:
+          onExecute:
+            - check_xray_available
