@@ -1,0 +1,48 @@
+resources:
+  - name: S_CreateReleaseBundle_8310_010_BuildInfo
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: s_artifactory
+      buildName: 'name'
+      buildNumber: '1'
+
+  - name: S_CreateReleaseBundle_8310_010_ReleaseBundle
+    type: ReleaseBundle
+    configuration:
+      sourceDistribution: S_CreateReleaseBundle_8310_010_distribution
+      name: name
+      version: '1'
+
+pipelines:
+  - name: pipeline_S_CreateReleaseBundle_8310_010
+    configuration:
+      jfrogCliVersion: 2
+      environmentVariables:
+        readOnly:
+          JFROG_CLI_BUILD_NUMBER: "${run_id}"
+    steps:
+      - name: S_CreateReleaseBundle_8310_010_1
+        type: Bash
+        configuration:
+          integrations:
+            - name: s_artifactory
+          outputResources:
+            - name: S_CreateReleaseBundle_8310_010_BuildInfo
+        execution:
+          onExecute:
+            - echo "${run_id}" > S_CreateReleaseBundle_8310_010.txt
+            - jfrog rt upload S_CreateReleaseBundle_8310_010.txt test-automation-generic-local --insecure-tls=$no_verify_ssl
+            - jfrog rt build-publish ${JFROG_CLI_BUILD_NAME} ${JFROG_CLI_BUILD_NUMBER} --insecure-tls=$no_verify_ssl
+            - write_output S_CreateReleaseBundle_8310_010_BuildInfo buildName=${JFROG_CLI_BUILD_NAME} buildNumber=${JFROG_CLI_BUILD_NUMBER}
+
+      - name: S_CreateReleaseBundle_8310_010_2
+        type: CreateReleaseBundle
+        configuration:
+          releaseBundleName: ${JFROG_CLI_BUILD_NAME}
+          releaseBundleVersion: ${run_id}
+          dryRun: false
+          sign: true
+          inputResources:
+            - name: S_CreateReleaseBundle_8310_010_BuildInfo
+          outputResources:
+            - name: S_CreateReleaseBundle_8310_010_ReleaseBundle

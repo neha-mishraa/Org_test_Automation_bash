@@ -1,0 +1,60 @@
+resources:
+  - name: S_CreateReleaseBundle_8310_001_BuildInfo
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: s_artifactory
+      buildName: 'name'
+      buildNumber: '1'
+  - name: S_CreateReleaseBundle_8310_001_ReleaseBundle
+    type: ReleaseBundle
+    configuration:
+      sourceDistribution: s_distribution
+      name: name
+      version: '1'
+
+pipelines:
+  - name: pipeline_S_CreateReleaseBundle_8310_001
+    configuration:
+      jfrogCliVersion: 2
+      environmentVariables:
+        readOnly:
+          JFROG_CLI_BUILD_NUMBER: "${run_id}"
+    steps:
+      - name: S_CreateReleaseBundle_8310_001_1
+        type: Bash
+        configuration:
+          integrations:
+            - name: s_artifactory
+          outputResources:
+            - name: S_CreateReleaseBundle_8310_001_BuildInfo
+        execution:
+          onExecute:
+            - echo "${run_id}" > S_CreateReleaseBundle_8310_001.txt
+            - jfrog rt upload S_CreateReleaseBundle_8310_001.txt test-automation-generic-local
+            - jfrog rt build-publish ${JFROG_CLI_BUILD_NAME} ${JFROG_CLI_BUILD_NUMBER}
+            - write_output S_CreateReleaseBundle_8310_001_BuildInfo buildName=${JFROG_CLI_BUILD_NAME} buildNumber=${JFROG_CLI_BUILD_NUMBER}
+      - name: S_CreateReleaseBundle_8310_001_2
+        type: CreateReleaseBundle
+        configuration:
+          releaseBundleName: ${JFROG_CLI_BUILD_NAME}
+          releaseBundleVersion: ${run_id}
+          dryRun: true
+          inputResources:
+            - name: S_CreateReleaseBundle_8310_001_BuildInfo
+          outputResources:
+            - name: S_CreateReleaseBundle_8310_001_ReleaseBundle
+
+      - name: S_CreateReleaseBundle_8310_001_3
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: S_CreateReleaseBundle_8310_001_2
+          integrations:
+            - name: s_artifactory
+            - name: s_distribution
+        execution:
+          onExecute:
+            - curlOptions="--silent --retry 3 -w %{http_code} -u $int_s_distribution_user:$int_s_distribution_apikey"
+            - if [ "$no_verify_ssl" == "true" ]; then curlOptions+=" --insecure"; fi
+            - "status=$(curl $curlOptions -H 'Content-Type: application/json' -XGET \"$int_s_distribution_url/api/v1/release_bundle/${JFROG_CLI_BUILD_NAME}/${run_id}\" --output $step_tmp_dir/response)"
+            - 'if [ "$status" != "404" ]; then echo "status: $status"; return 1; fi'
