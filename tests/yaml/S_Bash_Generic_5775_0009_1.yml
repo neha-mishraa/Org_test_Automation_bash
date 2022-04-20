@@ -1,0 +1,13 @@
+pipelines:
+  - name: S_Bash_Generic_5775_0009
+    configuration:
+      environmentVariables:
+        readOnly:
+          foo: jfrog
+          bar: pipelines
+    steps:
+      - name: S_Bash_Generic_5775_0009_1
+        type: Bash
+        execution:
+          onExecute:
+            - echo hello
