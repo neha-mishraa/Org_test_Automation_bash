@@ -4,8 +4,8 @@ pipelines:
       - name: S_Bash_ApprovalGates_5692_0012
         type: Bash
         configuration:
-          requiresApproval:
-            timeoutSeconds: 30
+          timeoutSeconds: 30
+          requiresApproval: true
         execution:
           onExecute:
             - echo "Hello World"
