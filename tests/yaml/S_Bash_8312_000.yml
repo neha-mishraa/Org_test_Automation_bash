@@ -1,0 +1,12 @@
+pipelines:
+  - name: S_Bash_8312_000
+    steps:
+      - name: S_Bash_8312_000
+        type: Bash
+        configuration:
+          integrations:
+            - name: s_artifactory
+        execution:
+          onExecute:
+            - echo "S_Bash_8312_000" > artifact.txt
+            - jfrog rt upload artifact.txt test-automation-generic-local/S_Bash_8312/S_Bash_8312_000-artifact.txt
