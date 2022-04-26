@@ -1,0 +1,22 @@
+resources:
+  - name: S_Bash_8312_003_RemoteFile
+    type: RemoteFile
+    configuration:
+      source: s_artifactory
+      fileLocation: test-automation-generic-local/S_Bash_8312
+      fileName: S_Bash_8312_000-artifact.txt
+      fileDateTime: r
+
+pipelines:
+  - name: S_Bash_8312_003
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_Bash_8312_003
+        type: Bash
+        configuration:
+          inputResources:
+            - name: S_Bash_8312_003_RemoteFile
+        execution:
+          onExecute:
+            - if [ ! -f "${res_S_Bash_8312_003_RemoteFile_resourcePath}/S_Bash_8312/${res_S_Bash_8312_003_RemoteFile_fileName}" ]; then return 1; fi
