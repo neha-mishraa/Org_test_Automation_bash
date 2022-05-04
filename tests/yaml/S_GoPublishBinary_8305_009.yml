@@ -1,0 +1,51 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_GoPublishBinary_8305_009_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: second_s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+  - name: S_GoPublishBinary_8305_009_buildInfo
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: second_s_artifactory
+
+pipelines:
+  - name: S_GoPublishBinary_8305_009
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_GoPublishBinary_8305_009_1
+        type: GoBuild
+        configuration:
+          affinityGroup: S_GoPublishBinary_8305_009
+          environmentVariables:
+              JFROG_CLI_BUILD_NUMBER: ${run_id}
+          sourceLocation: "tests/Go/HelloWorld"
+          resolverRepo: test-automation-go-virtual
+          integrations:
+            - name: second_s_artifactory
+          inputResources:
+            - name: S_GoPublishBinary_8305_009_GitRepo
+      - name: S_GoPublishBinary_8305_009_2
+        type: GoPublishBinary
+        configuration:
+          affinityGroup: S_GoPublishBinary_8305_009
+          environmentVariables:
+            JFROG_CLI_BUILD_NUMBER: ${run_id}
+          integrations:
+            - name: second_s_artifactory
+          autoPublishBuildInfo: true
+          forceXrayScan: true
+          inputSteps:
+            - name: S_GoPublishBinary_8305_009_1
+          targetRepository: test-automation-go-local
+          outputResources:
+            - name: S_GoPublishBinary_8305_009_buildInfo
+        execution:
+          onComplete:
+            - jfrog rt curl -XDELETE "/api/build/${JFROG_CLI_BUILD_NAME}?buildNumbers=${run_id}&artifacts=1&project=second"

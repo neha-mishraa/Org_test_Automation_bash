@@ -1,0 +1,47 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_GoPublishModule_8305_015_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: second_s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+  - name: S_GoPublishModule_8305_015_buildInfo
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: second_s_artifactory
+
+pipelines:
+  - name: S_GoPublishModule_8305_015
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_GoPublishModule_8305_015_1
+        type: GoPublishModule
+        configuration:
+          environmentVariables:
+            JFROG_CLI_BUILD_NUMBER: ${run_id}
+          sourceLocation: "tests/Go/HelloWorld"
+          version: "v0.830515.${run_number}"
+          autoPublishBuildInfo: true
+          forceXrayScan: true
+          inputResources:
+            - name: S_GoPublishModule_8305_015_GitRepo
+          targetRepository: test-automation-go-local
+          outputResources:
+            - name: S_GoPublishModule_8305_015_buildInfo
+      - name: S_GoPublishModule_8305_015_2
+        type: Bash
+        configuration:
+          inputResources:
+            - name: S_GoPublishModule_8305_015_buildInfo
+          inputSteps:
+            - name: S_GoPublishModule_8305_015_1
+          integrations:
+            - name: second_s_artifactory
+        execution:
+          onComplete:
+            - jfrog rt curl -XDELETE "/api/build/${res_S_GoPublishModule_8305_015_buildInfo_buildName}?buildNumbers=${res_S_GoPublishModule_8305_015_buildInfo_buildNumber}&artifacts=1&project=second"
