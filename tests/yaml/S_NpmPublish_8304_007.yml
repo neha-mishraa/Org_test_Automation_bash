@@ -18,9 +18,6 @@ pipelines:
   - name: S_NpmPublish_8304_007
     configuration:
       jfrogCliVersion: 2
-      environmentVariables:
-        readOnly:
-          JFROG_CLI_BUILD_PROJECT: second
     steps:
       - name: S_NpmPublish_8304_007_1
         type: NpmBuild
@@ -51,7 +48,5 @@ pipelines:
           outputResources:
             - name: S_NpmPublish_8304_007_buildInfo
         execution:
-          onStart:
-            - add_run_variables buildName=${JFROG_CLI_BUILD_NAME} buildNumber=${JFROG_CLI_BUILD_NUMBER}
           onComplete:
-            - jfrog rt curl -XDELETE "/api/build/${buildName}?buildNumbers=${buildNumber}&artifacts=1&project=second"
+            - jfrog rt curl -XDELETE "/api/build/${JFROG_CLI_BUILD_NAME}?buildNumbers=${run_id}&artifacts=1&project=second"
