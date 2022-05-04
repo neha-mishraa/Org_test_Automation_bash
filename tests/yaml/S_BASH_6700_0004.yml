@@ -1,0 +1,17 @@
+pipelines:
+  - name: S_BASH_6700_0004
+    steps:
+      - name: S_BASH_6700_0004_1
+        type: Bash
+        configuration:
+          runtime:
+            type: image
+            image:
+              auto:
+                language: java
+                version:
+                  - "14"
+                  - "11"
+        execution:
+          onExecute:
+            - echo hello
