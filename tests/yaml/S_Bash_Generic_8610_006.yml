@@ -1,0 +1,13 @@
+pipelines:
+  - name: S_Bash_Generic_8610_006_pipe
+    steps:
+      - name: S_Bash_Generic_8610_006_step
+        type: Bash
+        configuration:
+          runtime:
+            type: host
+        execution:
+          onExecute:
+            - badcommand
+          onFailure:
+            - badcommand

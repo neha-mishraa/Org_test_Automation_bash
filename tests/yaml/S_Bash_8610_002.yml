@@ -1,0 +1,22 @@
+pipelines:
+  - name: S_Bash_8610_002_pipe
+    steps:
+      - name: S_Bash_8610_002_step
+        type: Bash
+        execution:
+          onExecute:
+            - echo "onExecute"
+            - new_timeoutAt_date=$(date "+%F %T")
+            - payload="{\"timeoutAt\":\"$new_timeoutAt_date\"}"
+            - curl -XPUT -H "Authorization:Bearer $builder_api_token" -H "Content-type:application/json" $pipelines_api_url/steps/$step_id -d "$payload"
+            - |
+                local i=0
+                while [[ $i -lt 180 ]]; do
+                  echo "total wait time: $i seconds";
+                  sleep 1
+                  i=$(($i + 1))
+                done
+          onFailure:
+            - echo "onFailure"
+          onComplete:
+            - echo "onComplete"

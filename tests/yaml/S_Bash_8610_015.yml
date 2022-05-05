@@ -1,0 +1,19 @@
+pipelines:
+  - name: S_Bash_8610_015_pipe
+    steps:
+      - name: S_Bash_8610_015_step
+        type: Bash
+        configuration:
+          runtime:
+            type: host
+        execution:
+          onStart:
+            - echo onStart
+          onSuccess:
+            - export payload="{\"statusCode\":\"4013\"}" # cancel itself
+            - curl -XPUT -H "Authorization:Bearer $builder_api_token" -H "Content-type:application/json" $pipelines_api_url/steps/$step_id -d "$payload"
+            - echo onSuccess
+            - sleep 200
+            - echo finished # this should never show up in console
+          onComplete:
+            - echo finished # this should never show up in console
