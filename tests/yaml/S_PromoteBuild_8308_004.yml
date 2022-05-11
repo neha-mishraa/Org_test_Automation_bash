@@ -1,0 +1,60 @@
+resources:
+  - name: S_PromoteBuild_8308_004_input
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: s_artifactory
+      buildName: name
+      buildNumber: '1'
+  - name: S_PromoteBuild_8308_004_output
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: s_artifactory
+      buildName: name
+      buildNumber: '1'
+
+pipelines:
+  - name: pipeline_S_PromoteBuild_8308_004
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_PromoteBuild_8308_004_1
+        type: Bash
+        configuration:
+          integrations:
+            - name: s_artifactory
+          outputResources:
+            - name: S_PromoteBuild_8308_004_input
+        execution:
+          onExecute:
+            - echo "${run_id}" > S_PromoteBuild_8308_004.txt
+            - jfrog rt upload S_PromoteBuild_8308_004.txt test-automation-generic-local
+            - jfrog rt build-publish ${JFROG_CLI_BUILD_NAME} ${JFROG_CLI_BUILD_NUMBER}
+            - write_output S_PromoteBuild_8308_004_input buildName=${JFROG_CLI_BUILD_NAME} buildNumber=${JFROG_CLI_BUILD_NUMBER}
+      - name: S_PromoteBuild_8308_004_2
+        type: PromoteBuild
+        configuration:
+          targetRepository: test-automation-generic-promoted-local
+          status: TEST
+          comment: "My test comment"
+          inputResources:
+            - name: S_PromoteBuild_8308_004_input
+          outputResources:
+            - name: S_PromoteBuild_8308_004_output
+      - name: S_PromoteBuild_8308_004_3
+        type: Bash
+        configuration:
+          integrations:
+            - name: s_artifactory
+          inputResources:
+            - name: S_PromoteBuild_8308_004_output
+        execution:
+          onExecute:
+            - if [ "$res_S_PromoteBuild_8308_004_output_buildName" != "$JFROG_CLI_BUILD_NAME" ]; then exit 1; fi
+            - if [ "$res_S_PromoteBuild_8308_004_output_buildNumber" != "$JFROG_CLI_BUILD_NUMBER" ]; then exit 1; fi
+            - jfrog rt curl -XGET /api/build/${JFROG_CLI_BUILD_NAME}/${JFROG_CLI_BUILD_NUMBER} -o ${step_tmp_dir}/response
+            - jfrog rt curl -XDELETE /api/build/${JFROG_CLI_BUILD_NAME}?buildNumbers=${JFROG_CLI_BUILD_NUMBER}&artifacts=1
+            - cat ${step_tmp_dir}/response
+            - myStatus=$(cat ${step_tmp_dir}/response | jq -r '.buildInfo.statuses[0].status')
+            - if [ $myStatus != "TEST" ] ; then return 1; fi
+            - myComment=$(cat ${step_tmp_dir}/response | jq -r '.buildInfo.statuses[0].comment')
+            - if [ $myComment != "My test comment" ] ; then return 1; fi
