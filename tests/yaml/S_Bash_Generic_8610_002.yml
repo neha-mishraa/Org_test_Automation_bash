@@ -1,0 +1,12 @@
+pipelines:
+  - name: S_Bash_Generic_8610_002_pipe
+    steps:
+      - name: S_Bash_Generic_8610_002_step
+        type: Bash
+        execution:
+          onExecute:
+            - echo "onExecute"
+          onSuccess:
+            - echo "onSuccess"
+          onComplete:
+            - badcommand

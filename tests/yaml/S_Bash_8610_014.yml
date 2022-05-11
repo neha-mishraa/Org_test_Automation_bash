@@ -1,0 +1,27 @@
+pipelines:
+  - name: S_Bash_8610_014_pipe
+    steps:
+      - name: S_Bash_8610_014_step
+        type: Bash
+        configuration:
+          runtime:
+            type: host
+        execution:
+          onStart:
+            - echo onStart
+            - new_timeoutAt_date=$(date "+%F %T")
+            - payload="{\"timeoutAt\":\"$new_timeoutAt_date\"}"
+            - curl -XPUT -H "Authorization:Bearer $builder_api_token" -H "Content-type:application/json" $pipelines_api_url/steps/$step_id -d "$payload"
+            - |
+                local i=0
+                while [[ $i -lt 90 ]]; do
+                  echo "total wait time: $i seconds";
+                  sleep 1
+                  i=$(($i + 1))
+                done
+          onFailure:
+            - echo onFailure
+          onComplete:
+            - echo onComplete
+            - sleep 180
+            - echo finished # this should never show up in console

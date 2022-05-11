@@ -1,0 +1,20 @@
+pipelines:
+  - name: S_Bash_8610_001_pipe
+    steps:
+      - name: S_Bash_8610_001_step
+        type: Bash
+        execution:
+          onExecute:
+            - export payload="{\"statusCode\":\"4013\"}" # cancel itself
+            - curl -XPUT -H "Authorization:Bearer $builder_api_token" -H "Content-type:application/json" $pipelines_api_url/steps/$step_id -d "$payload"
+            - |
+                local i=0
+                while [[ $i -lt 60 ]]; do
+                  echo "total wait time: $i seconds";
+                  sleep 1
+                  i=$(($i + 1))
+                done
+          onFailure:
+            - echo "onFailure"
+          onComplete:
+            - echo "onComplete"

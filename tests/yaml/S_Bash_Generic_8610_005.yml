@@ -1,0 +1,15 @@
+pipelines:
+  - name: S_Bash_Generic_8610_005_pipe
+    steps:
+      - name: S_Bash_Generic_8610_005_step
+        type: Bash
+        configuration:
+          integrations:
+            - name: S_Bash_Generic_8610_artifactory
+        execution:
+          onExecute:
+            - echo "onExecute"
+          onFailure:
+            - echo "onFailure"
+          onComplete:
+            - echo "onComplete"
