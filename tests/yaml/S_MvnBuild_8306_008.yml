@@ -1,0 +1,27 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_MvnBuild_8306_008_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+pipelines:
+  - name: pipeline_S_MvnBuild_8306_008
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_MvnBuild_8306_008
+        type: MvnBuild
+        configuration:
+          inputResources:
+            - name: S_MvnBuild_8306_008_GitRepo
+          integrations:
+            - name: s_artifactory
+          sourceLocation: "tests/mvn"
+          resolverSnapshotRepo: test-automation-mvn-remote
+          resolverReleaseRepo: test-automation-mvn-remote

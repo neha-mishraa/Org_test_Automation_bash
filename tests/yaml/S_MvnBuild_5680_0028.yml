@@ -1,0 +1,33 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_MvnBuild_5680_0028_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+pipelines:
+  - name: pipeline_S_MvnBuild_5680_0028
+    steps:
+      - name: S_MvnBuild_5680_0028
+        type: MvnBuild
+        configuration:
+          environmentVariables:
+            config_file: "config"
+            config_location: "."
+          inputResources:
+            - name: S_MvnBuild_5680_0028_GitRepo
+          integrations:
+            - name: s_artifactory
+          configFileName: ${config_file}
+          configFileLocation: ${config_location}
+        execution:
+          onStart:
+            - pushd $(find_resource_variable $inputGitRepoResourceName resourcePath)
+            - mv tests/mvn/* .
+            - ls
+            - popd

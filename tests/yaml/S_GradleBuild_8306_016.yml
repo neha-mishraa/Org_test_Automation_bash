@@ -1,0 +1,38 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_GradleBuild_8306_016_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: second_s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+  - name: S_GradleBuild_8306_016_BuildInfo
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: second_s_artifactory
+pipelines:
+  - name: S_GradleBuild_8306_016
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_GradleBuild_8306_016_1
+        type: GradleBuild
+        configuration:
+          environmentVariables:
+            JFROG_CLI_BUILD_NUMBER: ${run_id}
+          sourceLocation: "tests/gradle"
+          autoPublishBuildInfo: true
+          gradleCommand: "hello"
+          forceXrayScan: true
+          inputResources:
+            - name: S_GradleBuild_8306_016_GitRepo
+          outputResources:
+            - name: S_GradleBuild_8306_016_BuildInfo
+          integrations:
+            - name: second_s_artifactory
+        execution:
+          onComplete:
+            - jfrog rt curl -XDELETE "/api/build/${JFROG_CLI_BUILD_NAME}?buildNumbers=${run_id}&artifacts=1&project=second"

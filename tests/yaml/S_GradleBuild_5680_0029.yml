@@ -1,0 +1,29 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_GradleBuild_5680_0029_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+pipelines:
+  - name: pipeline_S_GradleBuild_5680_0029
+    steps:
+      - name: S_GradleBuild_5680_0029
+        type: GradleBuild
+        configuration:
+          environmentVariables:
+            config_name: config
+            config_location: .
+          inputResources:
+            - name: S_GradleBuild_5680_0029_GitRepo
+          integrations:
+            - name: s_artifactory
+          configFileName: "${config_name}"
+          configFileLocation: "${config_location}"
+          sourceLocation: tests/gradle
+          gradleCommand: "hello"
