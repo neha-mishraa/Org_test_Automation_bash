@@ -11,6 +11,8 @@ resources:
 
 pipelines:
   - name: pipelines_S_Bash_8307_001
+    configuration:
+      jfrogCliVersion: 2
     steps:
       - name: S_Bash_8307_001_1
         type: Bash
@@ -23,7 +25,7 @@ pipelines:
           onExecute:
             - artifactory_registry_url=$(echo "$int_s_artifactory_url" | sed 's#.*//\([^/]*\)/.*#\1#')
             - add_run_variables artifactory_registry_url="$artifactory_registry_url"
-            - echo "FROM scratch" > Dockerfile
+            - echo "FROM releases-docker.jfrog.io/jfrog/pipelines-u18node:12.18.2" > Dockerfile
             - imageName=$(find_resource_variable S_Bash_8307_001_Image imageName)
             - imageTag=$(find_resource_variable S_Bash_8307_001_Image imageTag)
             - docker build --rm=true -t $imageName:$imageTag .
