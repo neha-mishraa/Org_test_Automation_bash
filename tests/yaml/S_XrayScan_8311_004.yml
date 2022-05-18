@@ -1,0 +1,52 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_XrayScan_8311_004_BuildInfo_output
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: second_s_artifactory
+  - name: S_XrayScan_8311_004_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: second_s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+pipelines:
+  - name: S_XrayScan_8311_004
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_XrayScan_8311_004_1
+        type: GoBuild
+        configuration:
+          affinityGroup: S_XrayScan_8311_004
+          environmentVariables:
+            JFROG_CLI_BUILD_NUMBER: ${run_id}
+          inputResources:
+            - name: S_XrayScan_8311_004_GitRepo
+          integrations:
+            - name: second_s_artifactory
+          sourceLocation: "tests/Go/HelloWorld"
+          resolverRepo: test-automation-go-virtual
+      - name: S_XrayScan_8311_004_2
+        type: GoPublishBinary
+        configuration:
+          affinityGroup: S_XrayScan_8311_004
+          inputSteps:
+            - name: S_XrayScan_8311_004_1
+          outputResources:
+            - name: S_XrayScan_8311_004_BuildInfo_output
+          targetRepository: test-automation-go-local
+          autoPublishBuildInfo: true
+      - name: S_XrayScan_8311_004_3
+        type: XrayScan
+        configuration:
+          affinityGroup: S_XrayScan_8311_004
+          inputResources:
+            - name: S_XrayScan_8311_004_BuildInfo_output
+        execution:
+          onComplete:
+            - jfrog rt curl -XDELETE "/api/build/${res_S_XrayScan_8311_004_BuildInfo_output_buildName}?buildNumbers=${res_S_XrayScan_8311_004_BuildInfo_output_buildNumber}&artifacts=1&project=second"
