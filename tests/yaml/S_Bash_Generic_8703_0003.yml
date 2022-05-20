@@ -1,0 +1,32 @@
+resources:
+  - name: S_Bash_Generic_8703_0003_PB_1
+    type: PropertyBag
+    configuration:
+      key: value1
+  - name: S_Bash_Generic_8703_0003_PB_2
+    type: PropertyBag
+    configuration:
+      key: value2
+
+pipelines:
+  - name: pipeline_S_Bash_Generic_8703_0003
+    steps:
+      - name: S_Bash_Generic_8703_0003_1
+        type: Bash
+        configuration:
+          inputResources:
+            - name: S_Bash_Generic_8703_0003_PB_1
+        execution:
+          onExecute:
+            - if [ "$res_S_Bash_Generic_8703_0003_PB_1_key" != "value1" ]; then exit 1; fi
+
+      - name: S_Bash_Generic_8703_0003_2
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: S_Bash_Generic_8703_0003_1
+          inputResources:
+            - name: S_Bash_Generic_8703_0003_PB_2
+        execution:
+          onExecute:
+            - if [ "$res_S_Bash_Generic_8703_0003_PB_2_key" != "value2" ]; then exit 1; fi
