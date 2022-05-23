@@ -27,11 +27,13 @@ pipelines:
       environmentVariables:
         readOnly:
           JFROG_CLI_BUILD_NUMBER: ${run_id}
+          CHART_VERSION: v0.5933034.${run_id}
     steps:
       - name: S_HelmPublish_5933_034_1
         type: HelmPublish
         configuration:
           chartPath: "./tests/helmCharts/myChart"
+          flags: "--version ${CHART_VERSION}"
           autoPublishBuildInfo: true
           inputResources:
             - name: S_HelmPublish_5933_034_GitRepo
@@ -40,6 +42,9 @@ pipelines:
             - name: S_HelmPublish_5933_034_HelmChart
           integrations:
             - name: s_artifactory
+        execution:
+          onStart:
+            - replace_envs ${res_S_HelmPublish_5933_034_GitRepo_resourcePath}/tests/helmCharts/myChart/Chart.yaml
       - name: S_HelmPublish_5933_034_2
         type: Bash
         configuration:

@@ -2,55 +2,57 @@ template: true
 valuesFilePath: ../values/gitRepoValues.yml
 
 resources:
-  - name: S_HelmPublish_5849_002_GitRepo
+  - name: S_HelmPublish_8309_002_GitRepo
     type: GitRepo
     configuration:
       gitProvider: s_gitHub
       path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
       branches:
         include: {{gitBranch}}
-  - name: S_HelmPublish_5849_002_HelmChart
+  - name: S_HelmPublish_8309_002_HelmChart
     type: HelmChart
     configuration:
       sourceArtifactory: s_artifactory
       repository: test-automation-helm-local
       version: version
       chart: chart
-  - name: S_HelmPublish_5849_002_BuildInfo
+  - name: S_HelmPublish_8309_002_BuildInfo
     type: BuildInfo
     configuration:
       sourceArtifactory: s_artifactory
 
 pipelines:
-  - name: pipeline_S_HelmPublish_5849_002
+  - name: pipeline_S_HelmPublish_8309_002
     configuration:
+      jfrogCliVersion: 2
       environmentVariables:
         readOnly:
           JFROG_CLI_BUILD_NUMBER: ${run_id}
-          CHART_VERSION: v0.5849002.${run_id}
+          CHART_VERSION: v0.8309002.${run_id}
     steps:
-      - name: S_HelmPublish_5849_002_1
+      - name: S_HelmPublish_8309_002_1
         type: HelmPublish
         configuration:
           chartPath: "./tests/helmCharts/myChart"
           flags: "--version ${CHART_VERSION}"
           autoPublishBuildInfo: true
           inputResources:
-            - name: S_HelmPublish_5849_002_GitRepo
+            - name: S_HelmPublish_8309_002_GitRepo
           outputResources:
-            - name: S_HelmPublish_5849_002_BuildInfo
-            - name: S_HelmPublish_5849_002_HelmChart
+            - name: S_HelmPublish_8309_002_BuildInfo
+            - name: S_HelmPublish_8309_002_HelmChart
           integrations:
             - name: s_artifactory
         execution:
           onStart:
-            - replace_envs ${res_S_HelmPublish_5849_002_GitRepo_resourcePath}/tests/helmCharts/myChart/Chart.yaml
-
-      - name: S_HelmPublish_5849_002_2
+            - replace_envs ${res_S_HelmPublish_8309_002_GitRepo_resourcePath}/tests/helmCharts/myChart/Chart.yaml
+      - name: S_HelmPublish_8309_002_2
         type: Bash
         configuration:
           inputSteps:
-            - name: S_HelmPublish_5849_002_1
+            - name: S_HelmPublish_8309_002_1
+          inputResources:
+            - name: S_HelmPublish_8309_002_BuildInfo
           integrations:
             - name: s_artifactory
         execution:
@@ -64,3 +66,5 @@ pipelines:
             - jfrog rt curl -XDELETE "/api/build/${JFROG_CLI_BUILD_NAME}?buildNumbers=${run_id}&artifacts=1"
             - stepArtifactSha=$(echo $stepArtifact | jq -r '.artifactSha')
             - if [ "$stepArtifactSha" != "$artifactSha" ]; then return 1; fi
+            - if [ "$res_S_HelmPublish_8309_002_BuildInfo_buildName" != "$JFROG_CLI_BUILD_NAME" ]; then return 1; fi
+            - if [ "$res_S_HelmPublish_8309_002_BuildInfo_buildNumber" != "$JFROG_CLI_BUILD_NUMBER" ]; then return 1; fi

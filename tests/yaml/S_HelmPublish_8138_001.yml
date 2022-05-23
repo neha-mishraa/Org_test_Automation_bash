@@ -6,7 +6,7 @@ resources:
     type: GitRepo
     configuration:
       gitProvider: s_gitHub
-      path: {{ .Values.GitHub.Org_test_Automation.path }}
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
       branches:
         include: {{gitBranch}}
   - name: S_HelmPublish_8138_001_HelmChart
@@ -27,11 +27,13 @@ pipelines:
       environmentVariables:
         readOnly:
           JFROG_CLI_BUILD_NUMBER: ${run_id}
+          CHART_VERSION: v0.8309001.${run_id}
     steps:
       - name: S_HelmPublish_8138_001
         type: HelmPublish
         configuration:
-          chartPath: "./tests/core/helmdeploy/simplehelm"
+          chartPath: "./tests/helmCharts/myChart"
+          flags: "--version ${CHART_VERSION}"
           helmVersion: 3
           lint: true
           valueFilePaths:
@@ -42,3 +44,6 @@ pipelines:
             - name: S_HelmPublish_8138_001_HelmChart
           integrations:
             - name: s_artifactory
+        execution:
+          onStart:
+            - replace_envs ${res_S_HelmPublish_8138_001_GitRepo_resourcePath}/tests/helmCharts/myChart/Chart.yaml
