@@ -2,14 +2,14 @@ template: true
 valuesFilePath: ../values/gitRepoValues.yml
 
 resources:
-  - name: S_HelmPublish_5933_030_GitRepo
+  - name: S_HelmPublish_8309_003_GitRepo
     type: GitRepo
     configuration:
       gitProvider: s_gitHub
       path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
       branches:
         include: {{gitBranch}}
-  - name: S_HelmPublish_5933_030_HelmChart
+  - name: S_HelmPublish_8309_003_HelmChart
     type: HelmChart
     configuration:
       sourceArtifactory: s_artifactory
@@ -18,24 +18,32 @@ resources:
       chart: chart
 
 pipelines:
-  - name: pipeline_S_HelmPublish_5933_030
+  - name: pipeline_S_HelmPublish_8309_003
     configuration:
+      jfrogCliVersion: 2
       environmentVariables:
         readOnly:
-          CHART_VERSION: v0.5933030.${run_id}
+          CHART_VERSION: v0.8309003.${run_id}
     steps:
-      - name: S_HelmPublish_5933_030
+      - name: S_HelmPublish_8309_003_1
         type: HelmPublish
         configuration:
           chartPath: "./tests/helmCharts/myChart"
           flags: "--version ${CHART_VERSION}"
-          lint: true
           inputResources:
-            - name: S_HelmPublish_5933_030_GitRepo
+            - name: S_HelmPublish_8309_003_GitRepo
           outputResources:
-            - name: S_HelmPublish_5933_030_HelmChart
+            - name: S_HelmPublish_8309_003_HelmChart
           integrations:
             - name: s_artifactory
         execution:
           onStart:
-            - replace_envs ${res_S_HelmPublish_5933_030_GitRepo_resourcePath}/tests/helmCharts/myChart/Chart.yaml
+            - replace_envs ${res_S_HelmPublish_8309_003_GitRepo_resourcePath}/tests/helmCharts/myChart/Chart.yaml
+      - name: S_HelmPublish_8309_003_2
+        type: Bash
+        configuration:
+          inputResources:
+            - name: S_HelmPublish_8309_003_HelmChart
+        execution:
+          onExecute:
+            - if [ "$res_S_HelmPublish_8309_003_HelmChart_version" == "version" ]; then return 1; fi

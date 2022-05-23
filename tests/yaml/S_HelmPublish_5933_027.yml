@@ -19,6 +19,10 @@ resources:
 
 pipelines:
   - name: pipeline_S_HelmPublish_5933_027
+    configuration:
+      environmentVariables:
+        readOnly:
+          CHART_VERSION: v0.5933027.${run_id}
     steps:
       - name: S_HelmPublish_5933_027
         type: HelmPublish
@@ -26,9 +30,13 @@ pipelines:
           environmentVariables:
             chartDirectory: "tests/helmCharts"
           chartPath: "./${chartDirectory}/myChart"
+          flags: "--version ${CHART_VERSION}"
           inputResources:
             - name: S_HelmPublish_5933_027_GitRepo
           outputResources:
             - name: S_HelmPublish_5933_027_HelmChart
           integrations:
             - name: s_artifactory
+        execution:
+          onStart:
+            - replace_envs ${res_S_HelmPublish_5933_027_GitRepo_resourcePath}/tests/helmCharts/myChart/Chart.yaml
