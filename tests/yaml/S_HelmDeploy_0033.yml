@@ -45,7 +45,7 @@ pipelines:
             - name: S_HelmDeploy_0033_BuildInfo_resource
         execution:
           onExecute:
-            - jfrog rt u ${res_S_HelmDeploy_0033_GitRepo_resource_resourcePath}/tests/core/helmdeploy/simplehelm-0.3.0.tgz "helmgeneric/" --explode
+            - jfrog rt u ${res_S_HelmDeploy_0033_GitRepo_resource_resourcePath}/tests/core/helmdeploy/simplehelm-0.3.0.tgz "helmgeneric/S_HelmDeploy_0033/" --explode
             - jfrog rt bce $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
             - jfrog rt bp $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
             - write_output S_HelmDeploy_0033_BuildInfo_resource buildName=$JFROG_CLI_BUILD_NAME buildNumber=$JFROG_CLI_BUILD_NUMBER
@@ -72,7 +72,7 @@ pipelines:
             - name: S_HelmDeploy_0033_ReleaseBundle_resource
           helmVersion: 3
           releaseName: ${RELEASE_NAME}
-          chartPath: helmgeneric/simplehelm
+          chartPath: helmgeneric/S_HelmDeploy_0033/simplehelm
           flags: "--force --wait --timeout 900s --set image.repository=trriplejay/simplehelm --set image.tag=latest"
           valueFilePaths:
             - values.yaml

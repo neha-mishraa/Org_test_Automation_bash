@@ -39,7 +39,7 @@ pipelines:
         execution:
           onStart:
             - cd ${res_S_HelmDeploy_GitRepo_0024_resource_resourcePath}/tests/core/helmdeploy
-            - jfrog rt u simplehelm/ helmgeneric --flat=false --build-name=$JFROG_CLI_BUILD_NAME --build-number=$JFROG_CLI_BUILD_NUMBER
+            - jfrog rt u simplehelm/ helmgeneric/S_HelmDeploy_0024/ --flat=false --build-name=$JFROG_CLI_BUILD_NAME --build-number=$JFROG_CLI_BUILD_NUMBER
             - jfrog rt bce $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
             - jfrog rt bp $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
             - write_output S_HelmDeploy_BuildInfo_0024_resource buildName=$JFROG_CLI_BUILD_NAME buildNumber=$JFROG_CLI_BUILD_NUMBER
@@ -54,7 +54,7 @@ pipelines:
             - name: S_HelmDeploy_0024_build_charts
           inputResources:
             - name: S_HelmDeploy_BuildInfo_0024_resource
-          chartPath: ./simplehelm/
+          chartPath: ./S_HelmDeploy_0024/simplehelm/
           helmVersion: 3
           releaseName: ${RELEASE_NAME}
           flags: "--force --wait --timeout 900s --set image.repository=trriplejay/simplehelm --set image.tag=latest"

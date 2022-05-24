@@ -39,7 +39,7 @@ pipelines:
         execution:
           onStart:
             - cd ${res_S_HelmDeploy_GitRepo_0026_resource_resourcePath}/tests/core/helmdeploy
-            - jfrog rt u simplehelm/ helmgeneric --flat=false --build-name=$JFROG_CLI_BUILD_NAME --build-number=$JFROG_CLI_BUILD_NUMBER
+            - jfrog rt u simplehelm/ helmgeneric/S_HelmDeploy_0026/ --flat=false --build-name=$JFROG_CLI_BUILD_NAME --build-number=$JFROG_CLI_BUILD_NUMBER
             - jfrog rt bce $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
             - jfrog rt bp $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
             - write_output S_HelmDeploy_BuildInfo_0026_resource buildName=$JFROG_CLI_BUILD_NAME buildNumber=$JFROG_CLI_BUILD_NUMBER
