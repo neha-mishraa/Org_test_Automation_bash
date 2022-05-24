@@ -6,17 +6,16 @@ resources:
     type: GitRepo
     configuration:
       gitProvider: s_gitHub
-      path: {{ .Values.GitHub.Org_test_Automation.path }}
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
       branches:
-        include: master
-
+        include: ^{{gitBranch}}$
   - name: S_HelmDeploy_7602_0005_HelmChart
     type: HelmChart
     configuration:
       sourceArtifactory: s_artifactory
       repository: test-automation-helm-local
       version: version
-      chart: simplehelm
+      chart: simplehelmdeploy
 
 pipelines:
   - name: S_HelmDeploy_7602_0005
@@ -26,11 +25,13 @@ pipelines:
           RELEASE_NAME: "s-helmdeploy-7602-0005-${run_id}"
           k8s_namespace: "pipe-master-pool"
           JFROG_CLI_BUILD_NUMBER: ${run_id}
+          CHART_VERSION: v0.76020005.${run_id}
     steps:
       - name: S_HelmDeploy_7602_0005_1
         type: HelmPublish
         configuration:
-          chartPath: "./tests/core/helmdeploy/simplehelm"
+          chartPath: "./tests/helmCharts/simplehelmdeploy"
+          flags: "--version ${CHART_VERSION}"
           helmVersion: 3
           inputResources:
             - name: S_HelmDeploy_7602_0005_GitRepo
@@ -38,6 +39,9 @@ pipelines:
             - name: S_HelmDeploy_7602_0005_HelmChart
           integrations:
             - name: s_artifactory
+        execution:
+          onStart:
+            - replace_envs ${res_S_HelmDeploy_7602_0005_GitRepo_resourcePath}/tests/helmCharts/simplehelmdeploy/Chart.yaml
       - name: S_HelmDeploy_7602_0005_2
         type: HelmDeploy
         configuration:
@@ -47,13 +51,13 @@ pipelines:
           integrations:
             - name: s_artifactory
             - name: s_kubernetes
-          chartVersion: 0.3.0
+          chartVersion: ${CHART_VERSION}
           chartPath: ./
           helmVersion: 3
           releaseName: ${RELEASE_NAME}
           flags: "--wait --timeout 120s -n ${k8s_namespace} --debug"
           valueFilePaths:
-            - ${res_S_HelmDeploy_7602_0005_GitRepo_resourcePath}/tests/core/helmdeploy/simplehelm/values2.yaml
+            - ${res_S_HelmDeploy_7602_0005_GitRepo_resourcePath}/tests/helmCharts/simplehelmdeploy/values2.yaml
           lint: true
           lintFlags: "--strict"
           test: true
