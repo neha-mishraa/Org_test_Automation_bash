@@ -1,0 +1,49 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_LX_HBGDeploy_8309_002_helm_resource
+    type: FileSpec
+    configuration:
+      sourceArtifactory: s_artifactory
+      pattern: >-
+        simplecharts/
+      recursive: true
+
+pipelines:
+  - name: S_LX_HBGDeploy_8309_002
+    configuration:
+      jfrogCliVersion: 2
+      environmentVariables:
+        readOnly:
+          blue_release_name: "blue-hbgdeploy-8309-2-${run_id}"
+          green_release_name: "green-hbgdeploy-8309-2-${run_id}"
+          idle_name: "idle-hbgdeploy-8309-2-${run_id}"
+          live_name: "live-hbgdeploy-8309-2-${run_id}"
+          k8s_namespace: {{ .Values.Kubernetes.namespace }}
+    steps:
+      - name: S_LX_HBGDeploy_8309_002
+        type: HelmBlueGreenDeploy
+        configuration:
+          integrations:
+            - name: s_kubernetes
+          inputResources:
+            - name: S_LX_HBGDeploy_8309_002_helm_resource
+          chartPath: ./
+          chartName: simplehelm
+          chartVersion: 0.3.0
+          namespace: ${k8s_namespace}
+          blueReleaseName: ${blue_release_name}
+          greenReleaseName: ${green_release_name}
+          roleServices:
+            - blueReferenceName: ${blue_release_name}-simplehelm
+              greenReferenceName: ${green_release_name}-simplehelm
+              idleName: ${idle_name}
+              liveName: ${live_name}
+        execution:
+          onSuccess:
+            - helm3 status ${blue_release_name}
+            - kubectl get service ${idle_name}
+          onComplete:
+            - helm3 delete ${blue_release_name} --namespace ${k8s_namespace} || true
+            - kubectl delete service ${idle_name} --namespace ${k8s_namespace} || true

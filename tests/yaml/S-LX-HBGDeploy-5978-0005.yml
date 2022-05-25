@@ -49,8 +49,8 @@ pipelines:
         execution:
           onExecute:
             - cd ${res_S_LX_HBGDeploy_5978_0005_GitRepo_resource_resourcePath}/tests/core/helmbluegreen
-            - jfrog rt u index.yaml simplecharts --build-name=$JFROG_CLI_BUILD_NAME --build-number=$JFROG_CLI_BUILD_NUMBER
-            - jfrog rt u simplehelm-0.3.0.tgz simplecharts --build-name=$JFROG_CLI_BUILD_NAME --build-number=$JFROG_CLI_BUILD_NUMBER
+            - jfrog rt upload index.yaml simplecharts/S_LX_HBGDeploy_5978_0005/ --build-name=$JFROG_CLI_BUILD_NAME --build-number=$JFROG_CLI_BUILD_NUMBER
+            - jfrog rt upload simplehelm-0.3.0.tgz simplecharts/S_LX_HBGDeploy_5978_0005/ --build-name=$JFROG_CLI_BUILD_NAME --build-number=$JFROG_CLI_BUILD_NUMBER
             - jfrog rt bce $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
             - jfrog rt bp $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
             - write_output S_LX_HBGDeploy_5978_0005_BuildInfo_resource buildName=$JFROG_CLI_BUILD_NAME buildNumber=$JFROG_CLI_BUILD_NUMBER
@@ -75,7 +75,7 @@ pipelines:
             - name: s_kubernetes
           inputResources:
             - name: S_LX_HBGDeploy_5978_0005_ReleaseBundle_resource
-          chartPath: simplecharts
+          chartPath: simplecharts/S_LX_HBGDeploy_5978_0005
           chartName: simplehelm
           chartVersion: 0.3.0
           namespace: ${k8s_namespace}
