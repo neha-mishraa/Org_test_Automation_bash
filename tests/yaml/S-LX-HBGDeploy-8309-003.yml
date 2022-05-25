@@ -2,14 +2,14 @@ template: true
 valuesFilePath: ../values/gitRepoValues.yml
 
 resources:
-  - name: S_LX_HBGDeploy_5978_0004_helm_resource
+  - name: S_LX_HBGDeploy_8309_003_helm_resource
     type: BuildInfo
     configuration:
       sourceArtifactory: s_artifactory
-      buildName: hbgdeploy-4
+      buildName: hbgdeploy-8309-3
       buildNumber: 1
 
-  - name: S_LX_HBGDeploy_5978_0004_git_resource
+  - name: S_LX_HBGDeploy_8309_003_git_resource
     type: GitRepo
     configuration:
       gitProvider: s_gitHub
@@ -18,48 +18,49 @@ resources:
         include: master
 
 pipelines:
-  - name: S_LX_HBGDeploy_5978_0004
+  - name: S_LX_HBGDeploy_8309_003
     configuration:
+      jfrogCliVersion: 2
       environmentVariables:
         readOnly:
-          blue_release_name: "blue-hbgdeploy-4-${run_id}"
-          green_release_name: "green-hbgdeploy-4-${run_id}"
-          idle_name: "idle-hbgdeploy-4-${run_id}"
-          live_name: "live-hbgdeploy-4-${run_id}"
+          blue_release_name: "blue-hbgdeploy-8309-3-${run_id}"
+          green_release_name: "green-hbgdeploy-8309-3-${run_id}"
+          idle_name: "idle-hbgdeploy-8309-3-${run_id}"
+          live_name: "live-hbgdeploy-8309-3-${run_id}"
           k8s_namespace: {{ .Values.Kubernetes.namespace }}
-          JFROG_CLI_BUILD_NAME: hbgdeploy-4
+          JFROG_CLI_BUILD_NAME: hbgdeploy-8309-3
           JFROG_CLI_BUILD_NUMBER: ${run_id}
     steps:
-      - name: S_LX_HBGDeploy_5978_0004_1
+      - name: S_LX_HBGDeploy_8309_003_1
         type: Bash
         configuration:
           integrations:
             - name: s_artifactory
           inputResources:
-            - name: S_LX_HBGDeploy_5978_0004_git_resource
+            - name: S_LX_HBGDeploy_8309_003_git_resource
               trigger: false
           outputResources:
-            - name: S_LX_HBGDeploy_5978_0004_helm_resource
+            - name: S_LX_HBGDeploy_8309_003_helm_resource
         execution:
           onExecute:
-            - cd ${res_S_LX_HBGDeploy_5978_0004_git_resource_resourcePath}/tests/core/helmbluegreen
-            - jfrog rt upload index.yaml simplecharts/S_LX_HBGDeploy_5978_0004/ --build-name=$JFROG_CLI_BUILD_NAME --build-number=$JFROG_CLI_BUILD_NUMBER
-            - jfrog rt upload simplehelm-0.3.0.tgz simplecharts/S_LX_HBGDeploy_5978_0004/ --build-name=$JFROG_CLI_BUILD_NAME --build-number=$JFROG_CLI_BUILD_NUMBER
+            - cd ${res_S_LX_HBGDeploy_8309_003_git_resource_resourcePath}/tests/core/helmbluegreen
+            - jfrog rt upload index.yaml simplecharts/S_LX_HBGDeploy_8309_003/ --build-name=$JFROG_CLI_BUILD_NAME --build-number=$JFROG_CLI_BUILD_NUMBER
+            - jfrog rt upload simplehelm-0.3.0.tgz simplecharts/S_LX_HBGDeploy_8309_003/ --build-name=$JFROG_CLI_BUILD_NAME --build-number=$JFROG_CLI_BUILD_NUMBER
             - jfrog rt bce $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
             - jfrog rt bp $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
-            - write_output S_LX_HBGDeploy_5978_0004_helm_resource buildName=$JFROG_CLI_BUILD_NAME buildNumber=$JFROG_CLI_BUILD_NUMBER
+            - write_output S_LX_HBGDeploy_8309_003_helm_resource buildName=$JFROG_CLI_BUILD_NAME buildNumber=$JFROG_CLI_BUILD_NUMBER
 
-      - name: S_LX_HBGDeploy_5978_0004_2
+      - name: S_LX_HBGDeploy_8309_003_2
         type: HelmBlueGreenDeploy
         configuration:
           inputSteps:
-            - name: S_LX_HBGDeploy_5978_0004_1
+            - name: S_LX_HBGDeploy_8309_003_1
           integrations:
             - name: s_artifactory
             - name: s_kubernetes
           inputResources:
-            - name: S_LX_HBGDeploy_5978_0004_helm_resource
-          chartPath: ./S_LX_HBGDeploy_5978_0004/
+            - name: S_LX_HBGDeploy_8309_003_helm_resource
+          chartPath: ./S_LX_HBGDeploy_8309_003/
           chartName: simplehelm
           chartVersion: 0.3.0
           namespace: ${k8s_namespace}
@@ -77,3 +78,4 @@ pipelines:
           onComplete:
             - helm3 delete ${blue_release_name} --namespace ${k8s_namespace} || true
             - kubectl delete service ${idle_name} --namespace ${k8s_namespace} || true
+            - jfrog rt curl -XDELETE "/api/build/${JFROG_CLI_BUILD_NAME}?buildNumbers=${run_id}&artifacts=1"
