@@ -9,23 +9,17 @@ resources:
       path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
       branches:
         include: {{gitBranch}}
-  - name: S_DockerBuild_5933_008_FileSpec_1
+  - name: S_DockerBuild_5933_008_FileSpec
     type: FileSpec
     configuration:
       sourceArtifactory: s_artifactory
       pattern: test-automation-generic-local/DockerBuild_5933_008
-  - name: S_DockerBuild_5933_008_FileSpec_2
-    type: FileSpec
-    configuration:
-      sourceArtifactory: s_artifactory
-      pattern: test-automation-generic-local/DockerBuild_5933_008
-
 
 pipelines:
   - name: pipeline_S_DockerBuild_5933_008
     configuration:
       inputResources:
-        - name: S_DockerBuild_5933_008_FileSpec_1
+        - name: S_DockerBuild_5933_008_FileSpec
     steps:
       - name: S_DockerBuild_5933_008_1
         type: DockerBuild
@@ -33,7 +27,7 @@ pipelines:
           dockerImageName: ${artifactory_registry_url}/test-automation-docker-local/s_dockerbuild_5933
           dockerImageTag: "${run_id}"
           inputResources:
-            - name: S_DockerBuild_5933_008_FileSpec_2
+            - name: S_DockerBuild_5933_008_FileSpec
             - name: S_DockerBuild_5933_008_GitRepo
           integrations:
             - name: s_artifactory
