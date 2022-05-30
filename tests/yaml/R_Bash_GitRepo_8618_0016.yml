@@ -1,0 +1,24 @@
+resources:
+  - name: R_Bash_GitRepo_8618_0016_gitRepo1
+    type: GitRepo
+    configuration:
+      gitProvider: github_gitRepo_integration
+      path: jfbetapipeorg/Org_test_Automation
+  - name: R_Bash_GitRepo_8618_0016_gitRepo2
+    type: GitRepo
+    configuration:
+      gitProvider: github_gitRepo_integration
+      path: jfbetapipeorg/Org_test_Automation
+
+pipelines:
+  - name: R_Bash_GitRepo_8618_0016_pipeline
+    steps:
+      - name: R_Bash_GitRepo_8618_0016_step
+        type: Bash
+        configuration:
+          inputResources:
+            - name: R_Bash_GitRepo_8618_0016_gitRepo1
+            - name: R_Bash_GitRepo_8618_0016_gitRepo2
+        execution:
+          onExecute:
+            - echo 'hello world!'
