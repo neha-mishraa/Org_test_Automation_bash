@@ -2,12 +2,12 @@ resources:
   - name: R_Bash_GitRepo_8618_0017_gitRepo1
     type: GitRepo
     configuration:
-      gitProvider: github_integration
-      path: jfbetapipeorg/Org_test_Automation
+      gitProvider: R_Bash_GitRepo_8618_0017_github_integration
+      path: jfbetapipeorg/Org_test_Automation_bash
   - name: R_Bash_GitRepo_8618_0017_gitRepo2
     type: GitRepo
     configuration:
-      gitProvider: github_integration
+      gitProvider: R_Bash_GitRepo_8618_0017_github_integration
       path: jfbetapipeorg/org_test_automation_deploy_keys
 
 pipelines:

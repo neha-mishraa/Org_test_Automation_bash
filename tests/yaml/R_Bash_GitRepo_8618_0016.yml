@@ -2,13 +2,13 @@ resources:
   - name: R_Bash_GitRepo_8618_0016_gitRepo1
     type: GitRepo
     configuration:
-      gitProvider: github_gitRepo_integration
-      path: jfbetapipeorg/Org_test_Automation
+      gitProvider: R_Bash_GitRepo_8618_0016_github_gitRepo_integration
+      path: jfbetapipeorg/Org_test_Automation_bash
   - name: R_Bash_GitRepo_8618_0016_gitRepo2
     type: GitRepo
     configuration:
-      gitProvider: github_gitRepo_integration
-      path: jfbetapipeorg/Org_test_Automation
+      gitProvider: R_Bash_GitRepo_8618_0016_github_gitRepo_integration
+      path: jfbetapipeorg/Org_test_Automation_bash
 
 pipelines:
   - name: R_Bash_GitRepo_8618_0016_pipeline
