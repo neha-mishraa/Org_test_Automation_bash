@@ -1,0 +1,71 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_DockerBuild_4748_002_GitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{gitBranch}}
+
+  - name: S_DockerBuild_4748_002_FileSpec_1
+    type: FileSpec
+    configuration:
+      sourceArtifactory: s_artifactory
+      pattern: DockerBuild_4748_002_Dockerfile
+
+  - name: S_DockerBuild_4748_002_FileSpec_2
+    type: FileSpec
+    configuration:
+      sourceArtifactory: s_artifactory
+      pattern: DockerBuild_4748_002_mySecondFile
+
+pipelines:
+  - name: pipeline_S_DockerBuild_4748_002_1
+    steps:
+      - name: S_DockerBuild_4748_002_1
+        type: Bash
+        configuration:
+          integrations:
+            - name: s_artifactory
+          outputResources:
+            - name: S_DockerBuild_4748_002_FileSpec_1
+            - name: S_DockerBuild_4748_002_FileSpec_2
+        execution:
+          onExecute:
+            - artifactory_registry_url=$(echo "$int_s_artifactory_url" | sed 's#.*//\([^/]*\)/.*#\1#')
+            - echo "FROM $artifactory_registry_url/test-automation-docker-remote/hello-world" > Dockerfile
+            - echo "ADD DockerBuild_4748_002_mySecondFile ." >> Dockerfile
+            - echo "My Other File" > mySecondFile
+            - jfrog rt upload Dockerfile test-automation-generic-local/DockerBuild_4748_002_Dockerfile
+            - jfrog rt upload mySecondFile test-automation-generic-local/DockerBuild_4748_002_mySecondFile
+            - write_output S_DockerBuild_4748_002_FileSpec_1 pattern=test-automation-generic-local/DockerBuild_4748_002_Dockerfile
+            - write_output S_DockerBuild_4748_002_FileSpec_2 pattern=test-automation-generic-local/DockerBuild_4748_002_mySecondFile
+
+  - name: pipeline_S_DockerBuild_4748_002_2
+    configuration:
+      inputResources:
+        - name: S_DockerBuild_4748_002_FileSpec_2
+    steps:
+      - name: S_DockerBuild_4748_002_2
+        type: DockerBuild
+        configuration:
+          affinityGroup: S_DockerBuild_4748_002
+          dockerImageName: ${artifactory_registry_url}/test-automation-docker-local/s_dockerbuild_4748
+          dockerImageTag: "${run_id}"
+          dockerFileName: DockerBuild_4748_002_Dockerfile
+          inputResources:
+            - name: S_DockerBuild_4748_002_GitRepo
+              trigger: false
+            - name: S_DockerBuild_4748_002_FileSpec_1
+              trigger: false
+          integrations:
+            - name: s_artifactory
+            - name: s_rt_dockerRegistry
+        execution:
+          onStart:
+            - artifactory_registry_url=$(echo "$int_s_artifactory_url" | sed 's#.*//\([^/]*\)/.*#\1#')
+          onComplete:
+            - docker rmi "${artifactory_registry_url}/test-automation-docker-local/s_dockerbuild_4748:${run_id}" || true
