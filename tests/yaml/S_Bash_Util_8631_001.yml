@@ -1,0 +1,17 @@
+pipelines:
+  - name: S_Bash_Util_8631_001
+    configuration:
+      jfrogCliVersion: 2
+      environmentVariables:
+        readOnly:
+          JFROG_XRAY_URL: "${int_s_artifactory_url%artifactory}notxray"
+    steps:
+      - name: S_Bash_Util_8631_001
+        type: Bash
+        configuration:
+          integrations:
+            - name: s_artifactory
+        execution:
+          onExecute:
+            - jfrog config show s_artifactory | grep "${int_s_artifactory_url%artifactory}notxray"
+            - check_xray_available --server-name s_artifactory
