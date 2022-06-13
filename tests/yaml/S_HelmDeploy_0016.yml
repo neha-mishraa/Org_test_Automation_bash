@@ -1,8 +1,4 @@
-template: true
-valuesFilePath: ../values/gitRepoValues.yml
-
 resources:
-
   - name: S_HelmDeploy_FileSpec_0016_helmrepo_resource
     type: FileSpec
     configuration:
@@ -10,14 +6,6 @@ resources:
       pattern: >-
         simplecharts/
       recursive: true
-
-  - name: S_HelmDeploy_GitRepo_0016_resource
-    type: GitRepo
-    configuration:
-      gitProvider: s_gitHub
-      path: {{ .Values.GitHub.Org_test_Automation.path }}
-      branches:
-        include: master
 
 pipelines:
   - name: pipeline_S_HelmDeploy_0016
@@ -27,23 +15,9 @@ pipelines:
           release_name_from_helm_repo: "simplehelm-from-repo-${run_id}"
           k8s_namespace: "pipe-master-pool"
     steps:
-      - name: trigger_pipeline_S_HelmDeploy_0016
-        type: Bash
-        configuration:
-          integrations:
-            - name: s_artifactory
-          inputResources:
-            - name: S_HelmDeploy_GitRepo_0016_resource
-              trigger: false
-        execution:
-          onExecute:
-            - echo 'bash step'
-
-      - name: deploy_helm_chart_from_helm_repo
+      - name: S_HelmDeploy_0016
         type: HelmDeploy
         configuration:
-          inputSteps:
-            - name: trigger_pipeline_S_HelmDeploy_0016
           integrations:
             - name: s_artifactory
             - name: s_kubernetes
