@@ -1,8 +1,0 @@
-pipelines:
-  - name: P_WF_10056_0001
-    steps:
-      - name: P_WF_10056_0001_1
-        type: Bash
-        execution:
-          onExecute:
-            - echo "hello"
