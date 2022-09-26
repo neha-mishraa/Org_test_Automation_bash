@@ -41,3 +41,4 @@ pipelines:
         execution:
           onComplete:
             - helm3 delete ${RELEASE_NAME} --namespace ${k8s_namespace}
+            - kubectl delete pod --namespace ${k8s_namespace} ${RELEASE_NAME}-test-connection

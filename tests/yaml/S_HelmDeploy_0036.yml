@@ -48,3 +48,4 @@ pipelines:
           onComplete:
             - echo "Deleting helm resources..."
             - helm3 delete simplehelm-generic-$run_id --namespace $K8S_NAMESPACE
+            - kubectl delete pod --namespace $K8S_NAMESPACE simplehelm-generic-$run_id-test-connection

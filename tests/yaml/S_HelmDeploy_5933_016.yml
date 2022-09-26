@@ -102,3 +102,4 @@ pipelines:
             - if [ $status -eq 204 ]; then echo "Deleted release bundle $releaseBundleName/$releaseBundleVersion successfully"; fi
             - echo "Deleting helm resources..."
             - helm3 delete ${RELEASE_NAME} --namespace $K8S_NAMESPACE
+            - kubectl delete pod --namespace $K8S_NAMESPACE ${RELEASE_NAME}-test-connection
