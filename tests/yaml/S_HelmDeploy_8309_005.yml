@@ -94,4 +94,5 @@ pipelines:
             - echo "Deleting artifactory repository..."
             - echo "Deleting helm resources..."
             - helm3 delete simplehelm-generic-$run_id --namespace $K8S_NAMESPACE
+            - kubectl delete pod --namespace $K8S_NAMESPACE simplehelm-generic-$run_id-test-connection
             - jfrog rt curl -XDELETE "/api/build/${JFROG_CLI_BUILD_NAME}?buildNumbers=${JFROG_CLI_BUILD_NUMBER}&artifacts=1"
