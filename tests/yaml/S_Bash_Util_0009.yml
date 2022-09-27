@@ -1,28 +1,10 @@
-template: true
-valuesFilePath: ../values/gitRepoValues.yml
-
-resources:
-  - name: S_Bash_Util_0009
-    type: GitRepo
-    configuration:
-      gitProvider: s_gitHub
-      path: {{ .Values.GitHub.Org_test_Automation.path }}
-
 pipelines:
   - name: pipeline_S_Bash_Util_0009
     steps:
       - name: S_Bash_Util_0009
         type: Bash
-        configuration:
-          inputResources:
-            - name: S_Bash_Util_0009
-
         execution:
           onExecute:
-            - pushd $res_S_Bash_Util_0009_resourcePath
-            - python3 -m py_compile tests/core/sampleExecutionFile/calc.py
-            - pip install --upgrade pip
-            - hash -d pip
-            - pip install pytest
-            - save_tests $res_S_Bash_Util_0009_resourcePath
-            - popd
+            - mkdir myDirectory
+            - echo "test" > myDirectory/test.txt
+            - save_tests $(pwd)/myDirectory
