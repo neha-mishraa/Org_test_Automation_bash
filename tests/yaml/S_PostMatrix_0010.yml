@@ -1,5 +1,5 @@
 pipelines:
-  - name: PostMatrix_pipeline
+  - name: S_PostMatrix_0010_pipeline
     steps:
       - name: S_PostMatrix_0010
         type: Matrix
@@ -12,16 +12,16 @@ pipelines:
             - echo "Executing matrix step"
             - set_step_var test_key "automation"
             - add_run_variables id=$steplet_id
-            - export_run_variables 
+            - export_run_variables
 
       - name: PostMatrix_step
         type: PostMatrix
         configuration:
-          inputSteps: 
+          inputSteps:
             - name: S_PostMatrix_0010
         execution:
           onExecute:
             - echo "Executing fanin step"
-            - res=$(printenv | grep test_key | sed -n '1p')
+            - res=$(eval echo "$"S_PostMatrix_0010_"$id"_test_key)
             - |
-              [[ "$res" == S_PostMatrix_0010_"$id"_test_key=automation ]]
+              [[ "$res" == "automation" ]]
