@@ -1,0 +1,10 @@
+pipelines:
+  - name: RM_9717_0003
+    steps:
+      - name: RM_9717_0003_1
+        type: Bash
+        configuration:
+          nodePool: RM_9717_0003
+        execution:
+          onExecute:
+            - echo hello
