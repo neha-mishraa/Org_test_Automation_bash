@@ -1,0 +1,8 @@
+pipelines:
+  - name: RM_9717_0002
+    steps:
+      - name: RM_9717_0002_1
+        type: Bash
+        execution:
+          onExecute:
+            - echo hello
