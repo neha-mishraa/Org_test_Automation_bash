@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ -z "$@" ]; then
+  echo "Hello nobody"
+else
+  echo "Hello $@!"
+fi

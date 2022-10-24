@@ -1,0 +1,44 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_Bash_Tasks_9910_08_repo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{ gitBranch }}
+
+pipelines:
+  - name: S_Bash_Tasks_9910_08_pipeline
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_Bash_Tasks_9910_08_step
+        type: Bash
+        configuration:
+          environmentVariables:
+            taskVersion: "v1.8.${run_id}"
+          integrations:
+            - name: s_artifactory
+          inputResources:
+            - name: S_Bash_Tasks_9910_08_repo
+              trigger: false
+        execution:
+          onStart:
+            - mkdir -p "$step_tmp_dir/$taskVersion"
+            - cp -r $(find_resource_variable S_Bash_Tasks_9910_08_repo resourcePath)/tests/tasks/hello/* $step_tmp_dir/$taskVersion/
+            - cd $step_tmp_dir/
+            - jf rt u "$taskVersion/*" "test-automation-generic-local/jfrog/hello/${taskVersion}.zip" --archive zip
+            - task: jfrog/hello@${taskVersion}
+              repository: test-automation-generic-local
+              id: S_Bash_Tasks_9910_08_task
+              input:
+                target: "start"
+          onComplete:
+            - echo "on Complete"
+            - jf rt del "test-automation-generic-local/jfrog/hello/${taskVersion}.zip" || true
+          onSuccess:
+            - echo "on Success"
+

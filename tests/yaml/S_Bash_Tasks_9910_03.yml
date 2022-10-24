@@ -1,0 +1,31 @@
+
+pipelines:
+  - name: S_Bash_Tasks_9910_03_pipeline
+    steps:
+      - name: S_Bash_Tasks_9910_03_step
+        type: Bash
+        execution:
+          onStart:
+            - echo "on Start"
+            - if [ -z "$JFROG_TASK_WORKSPACE_DIR" ]; then echo "$JFROG_TASK_WORKSPACE_DIR not set" && exit 1; fi
+            - if [ -z "$JFROG_POST_HOOKS_DIR" ]; then echo "JFROG_POST_HOOKS_DIR not set" && exit 1; fi
+            - if [ -z "$JFROG_PIPE_CLI_PATH" ]; then echo "JFROG_PIPE_CLI_PATH not set" && exit 1; fi
+            - if [ -z "$JFROG_SCRIPT_EXTENSION" ]; then echo "JFROG_SCRIPT_EXTENSION not set" && exit 1; fi
+            - if [ -z "$JFROG_DEFAULT_TASK_REPO" ]; then echo "JFROG_DEFAULT_TASK_REPO not set" && exit 1; fi
+            - if [ -z "$JFROG_OPERATING_SYSTEM" ]; then echo "JFROG_OPERATING_SYSTEM not set" && exit 1; fi
+            - if [ -z "$JFROG_STEP_TMP_DIR" ]; then echo "JFROG_STEP_TMP_DIR not set" && exit 1; fi
+            - if [ -z "$JFROG_STEP_WORKSPACE_DIR" ]; then echo "JFROG_STEP_WORKSPACE_DIR not set" && exit 1; fi
+            - if [ -z "$JFROG_SHARED_WORKSPACE_DIR" ]; then echo "JFROG_SHARED_WORKSPACE_DIR not set" && exit 1; fi
+            - if [ -z "$JFROG_BUILDER_API_TOKEN" ]; then echo "JFROG_BUILDER_API_TOKEN not set" && exit 1; fi
+            - if [ -z "$JFROG_PIPELINES_API_URL" ]; then echo "JFROG_PIPELINES_API_URL not set" && exit 1; fi
+            - if [ -z "$JFROG_STEPLET_RUN_STATE_DIR" ]; then echo "JFROG_STEPLET_RUN_STATE_DIR not set" && exit 1; fi
+            - if [ -z "$JFROG_RUN_VARIABLES_FILE" ]; then echo "JFROG_RUN_VARIABLES_FILE not set" && exit 1; fi
+            - if [ -z "$JFROG_PIPELINE_VARIABLES_FILE" ]; then echo "JFROG_PIPELINE_VARIABLES_FILE not set" && exit 1; fi
+            - if [ -z "$JFROG_PIPELINE_WORKSPACE_DIR" ]; then echo "JFROG_PIPELINE_WORKSPACE_DIR not set" && exit 1; fi
+            - if [ -z "$JFROG_STEPLET_WORKSPACE_DIR" ]; then echo "JFROG_STEPLET_WORKSPACE_DIR not set" && exit 1; fi
+          onExecute:
+            - echo "on Execute"
+          onComplete:
+            - echo "on Complete"
+          onSuccess:
+            - echo "on Success"
