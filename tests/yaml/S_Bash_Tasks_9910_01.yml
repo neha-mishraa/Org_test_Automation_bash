@@ -1,0 +1,15 @@
+
+pipelines:
+  - name: S_Bash_Tasks_9910_01_pipeline
+    steps:
+      - name: S_Bash_Tasks_9910_01_step
+        type: Bash
+        execution:
+          onStart:
+            - pipe --version
+          onExecute:
+            - pipe --version
+          onComplete:
+            - pipe --version
+          onSuccess:
+            - pipe --version
