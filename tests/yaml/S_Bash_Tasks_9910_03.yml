@@ -23,6 +23,12 @@ pipelines:
             - if [ -z "$JFROG_PIPELINE_VARIABLES_FILE" ]; then echo "JFROG_PIPELINE_VARIABLES_FILE not set" && exit 1; fi
             - if [ -z "$JFROG_PIPELINE_WORKSPACE_DIR" ]; then echo "JFROG_PIPELINE_WORKSPACE_DIR not set" && exit 1; fi
             - if [ -z "$JFROG_STEPLET_WORKSPACE_DIR" ]; then echo "JFROG_STEPLET_WORKSPACE_DIR not set" && exit 1; fi
+            - if [ -z "$JFROG_RUN_ID" ]; then echo "JFROG_RUN_ID not set" && exit 1; fi
+            - if [ -z "$JFROG_RUN_NUMBER" ]; then echo "JFROG_RUN_NUMBER not set" && exit 1; fi
+            - if [ -z "$JFROG_STEPLET_NUMBER" ]; then echo "JFROG_STEPLET_NUMBER not set" && exit 1; fi
+            - if [ -z "$JFROG_PROJECT_NAME" ]; then echo "JFROG_PROJECT_NAME not set" && exit 1; fi
+            - if [ -z "$JFROG_PROJECT_ID" ]; then echo "JFROG_PROJECT_ID not set" && exit 1; fi
+            - if [ -z "$JFROG_PROJECT_KEY" ]; then echo "JFROG_PROJECT_KEY not set" && exit 1; fi
           onExecute:
             - echo "on Execute"
           onComplete:
