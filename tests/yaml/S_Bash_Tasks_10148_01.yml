@@ -1,0 +1,41 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_Bash_Tasks_10148_01_repo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{ gitBranch }}
+
+pipelines:
+  - name: S_Bash_Tasks_10148_01_pipeline
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: S_Bash_Tasks_10148_01_step
+        type: Bash
+        configuration:
+          environmentVariables:
+            taskVersion: "v1.10148.${run_id}"
+          integrations:
+            - name: s_artifactory
+          inputResources:
+            - name: S_Bash_Tasks_9910_11_repo
+              trigger: false
+        execution:
+          onExecute:
+            - task: "$(find_resource_variable S_Bash_Tasks_10148_01_repo resourcePath)/tests/tasks/hello"
+              id: S_Bash_Tasks_10148_01_task
+              input:
+                target: "execute"
+          onComplete:
+            - echo "on Complete"
+          onSuccess:
+            - echo "on Success"
+          onFailure:
+
+            - echo "on Failure"
+
