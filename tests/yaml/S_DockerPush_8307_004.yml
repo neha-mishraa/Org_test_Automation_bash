@@ -55,8 +55,8 @@ pipelines:
         execution:
           onExecute:
             - artifactory_registry_url=$(echo "$int_s_artifactory_url" | sed 's#.*//\([^/]*\)/.*#\1#')
-            - "docker rmi ${artifactory_registry_url}/test-automation-docker-local/s_dockerpush_8307:${run_id}" || true
+            - "docker rmi ${artifactory_registry_url}/test-automation-docker-local/s_dockerpush_8307:${run_id} || true"
             - "jfrog rt docker-pull ${artifactory_registry_url}/test-automation-docker-local/s_dockerpush_8307:${run_id} test-automation-docker-local"
             - image="$(docker images | grep ${artifactory_registry_url}/test-automation-docker-local/s_dockerpush_8307 | grep ${run_id})"
             - if [ -z "$image" ]; then return 1; fi
-            - docker rmi "${artifactory_registry_url}/test-automation-docker-local/s_dockerpush_8307:${run_id}" || true
+            - "docker rmi ${artifactory_registry_url}/test-automation-docker-local/s_dockerpush_8307:${run_id} || true"
