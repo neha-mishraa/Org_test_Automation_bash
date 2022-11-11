@@ -10,8 +10,8 @@ output:
 execution:
   - echo "main"
   - echo "Hello $IN_target"
-  - . bin/$JFROG_SCRIPT_EXTENSION/verifyEnvs.$JFROG_SCRIPT_EXTENSION
-  - . bin/$JFROG_SCRIPT_EXTENSION/hello.$JFROG_SCRIPT_EXTENSION
+  - ./bin/$JFROG_SCRIPT_EXTENSION/verifyEnvs.$JFROG_SCRIPT_EXTENSION
+  - ./bin/$JFROG_SCRIPT_EXTENSION/hello.$JFROG_SCRIPT_EXTENSION
 hooks:
   onStepComplete:
     - echo "on Step Complete"
