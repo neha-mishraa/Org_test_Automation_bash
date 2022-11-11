@@ -23,12 +23,11 @@ pipelines:
           integrations:
             - name: s_artifactory
           inputResources:
-            - name: S_Bash_Tasks_9910_11_repo
+            - name: S_Bash_Tasks_10148_01_repo
               trigger: false
         execution:
           onExecute:
             - task: "${res_S_Bash_Tasks_10148_01_repo_resourcePath}/tests/tasks/hello"
-              id: S_Bash_Tasks_10148_01_task
               input:
                 target: "execute"
           onComplete:
@@ -36,6 +35,5 @@ pipelines:
           onSuccess:
             - echo "on Success"
           onFailure:
-
             - echo "on Failure"
 

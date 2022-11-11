@@ -28,9 +28,9 @@ pipelines:
         execution:
           onStart:
             - mkdir -p "$step_tmp_dir/$taskVersion"
-            - cp -r $(find_resource_variable S_Bash_Tasks_9910_05_repo resourcePath)/tests/tasks/hello/* $step_tmp_dir/$taskVersion/
+            - cp -r $(find_resource_variable S_Bash_Tasks_9910_05_repo resourcePath)/tests/tasks/hello/* $step_tmp_dir/task/
             - cd $step_tmp_dir/
-            - jf rt u "$taskVersion/*" "test-automation-generic-local/jfrog/hello/${taskVersion}.zip" --archive zip
+            - jf rt u "task/*" "test-automation-generic-local/jfrog/hello/${taskVersion}.zip" --archive zip
           onExecute:
             - task: jfrog/hello@${taskVersion}
               repository: test-automation-generic-local
