@@ -27,7 +27,7 @@ pipelines:
               trigger: false
         execution:
           onStart:
-            - mkdir -p "$step_tmp_dir/$taskVersion"
+            - mkdir -p "$step_tmp_dir/task"
             - cp -r $(find_resource_variable S_Bash_Tasks_9910_11_repo resourcePath)/tests/tasks/hello/* $step_tmp_dir/task/
             - cd $step_tmp_dir/
             - jf rt u "task/*" "test-automation-generic-local/jfrog/hello/${taskVersion}.zip" --archive zip
