@@ -28,6 +28,7 @@ pipelines:
         execution:
           onExecute:
             - task: "${res_S_Bash_Tasks_10148_01_repo_resourcePath}/tests/tasks/hello"
+              id: S_Bash_Tasks_10148
               input:
                 target: "execute"
           onComplete:
