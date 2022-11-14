@@ -24,7 +24,6 @@ pipelines:
         configuration:
           integrations:
             - name: s_artifactory
-            - name: s_rt_dockerRegistry
           outputResources:
             -  name: S_DockerBuild_5933_015_FileSpec
         execution:
@@ -45,9 +44,9 @@ pipelines:
             - name: S_DockerBuild_5933_015_FileSpec
           integrations:
             - name: s_artifactory
+            - name: s_rt_dockerRegistry
         execution:
           onStart:
-           
             - artifactory_registry_url=$(echo "$int_s_artifactory_url" | sed 's#.*//\([^/]*\)/.*#\1#')
           onComplete:
             - docker rmi "${artifactory_registry_url}/test-automation-docker-local/s_dockerbuild_5933:${run_id}" || true

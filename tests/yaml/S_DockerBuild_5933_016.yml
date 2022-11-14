@@ -14,7 +14,7 @@ resources:
     type: FileSpec
     configuration:
       sourceArtifactory: s_artifactory
-      pattern: test-automation-generic-local/DockerBuild_5933_016
+      pattern: test-automation-generic-local/DockerBuild_5933_016_Dockerfile
 
 pipelines:
   - name: pipeline_S_DockerBuild_5933_016
@@ -24,11 +24,11 @@ pipelines:
         configuration:
           integrations:
             - name: s_artifactory
-            - name: s_rt_dockerRegistry
           outputResources:
             - name: S_DockerBuild_5933_016_FileSpec
         execution:
           onExecute:
+            - artifactory_registry_url=$(echo "$int_s_artifactory_url" | sed 's#.*//\([^/]*\)/.*#\1#')
             - echo "FROM $artifactory_registry_url/test-automation-docker-remote/hello-world" > Dockerfile
             - jfrog rt upload Dockerfile test-automation-generic-local/DockerBuild_5933_016_Dockerfile
 
@@ -47,6 +47,7 @@ pipelines:
           dockerFileName: DockerBuild_5933_016_Dockerfile
           integrations:
             - name: s_artifactory
+            - name: s_rt_dockerRegistry
         execution:
           onStart:
             - artifactory_registry_url=$(echo "$int_s_artifactory_url" | sed 's#.*//\([^/]*\)/.*#\1#')
