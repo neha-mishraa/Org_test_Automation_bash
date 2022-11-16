@@ -13,6 +13,7 @@ pipelines:
             - if [ -z "$JFROG_SCRIPT_EXTENSION" ]; then echo "JFROG_SCRIPT_EXTENSION not set" && exit 1; fi
             - if [ -z "$JFROG_DEFAULT_TASK_REPO" ]; then echo "JFROG_DEFAULT_TASK_REPO not set" && exit 1; fi
             - if [ -z "$JFROG_OPERATING_SYSTEM" ]; then echo "JFROG_OPERATING_SYSTEM not set" && exit 1; fi
+            - if [ -z "$JFROG_OPERATING_SYSTEM_FAMILY" ]; then echo "JFROG_OPERATING_SYSTEM_FAMILY not set" && exit 1; fi
             - if [ -z "$JFROG_STEP_TMP_DIR" ]; then echo "JFROG_STEP_TMP_DIR not set" && exit 1; fi
             - if [ -z "$JFROG_STEP_WORKSPACE_DIR" ]; then echo "JFROG_STEP_WORKSPACE_DIR not set" && exit 1; fi
             - if [ -z "$JFROG_SHARED_WORKSPACE_DIR" ]; then echo "JFROG_SHARED_WORKSPACE_DIR not set" && exit 1; fi
