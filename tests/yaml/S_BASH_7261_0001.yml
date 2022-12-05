@@ -20,7 +20,7 @@ pipelines:
           inputSteps:
             - name: S_BASH_7261_0001_1
           integrations:
-            - name: s_BASH_7261_SSHKEY
+            - name: S_BASH_7261_SSHKEY
         execution:
           onExecute:
             - ls ~/.ssh
