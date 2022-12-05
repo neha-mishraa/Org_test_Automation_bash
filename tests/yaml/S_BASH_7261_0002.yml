@@ -2,7 +2,7 @@ resources:
   - name: S_BASH_7261_0002_resource
     type: VmCluster
     configuration:
-      sshKey: s_BASH_7261_SSHKEY
+      sshKey: S_BASH_7261_SSHKEY
       targets:
         - 0.0.0.0
 
