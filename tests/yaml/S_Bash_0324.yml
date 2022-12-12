@@ -21,8 +21,6 @@ pipelines:
             - |
               [ ! -z "$int_BSI_IW_TokenAuth_authorization"  ]
             - |
-              [ ! -z "$int_BSI_IW_BasicAuth_secret"  ]
-            - |
               [ ! -z "$int_BSI_IW_BasicAuth_authType"  ]
             - |
               [ ! -z "$int_BSI_IW_BasicAuth_masterName"  ]
@@ -34,5 +32,3 @@ pipelines:
               [ ! -z "$int_BSI_IW_BasicAuth_password"  ]
             - |
               [ ! -z "$int_BSI_IW_BasicAuth_id"  ]
-            - |
-              [ ! -z "$int_BSI_IW_BasicAuth_authorization"  ]

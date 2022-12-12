@@ -6,7 +6,7 @@ pipelines:
         type: Bash
         configuration:
           integrations:
-            - name: S_Bash_023_airBrake
+            - name: BSI_AirBrake
         execution:
           onExecute:
             - echo "executing step..."

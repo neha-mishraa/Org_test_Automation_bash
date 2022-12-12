@@ -6,6 +6,6 @@ pipelines:
         configuration:
           jenkinsJobName: testFolder/singlebranch
           buildParameters:
-            waitTime: 120
+            waitTime: 180
           integrations:
             - name: S_B_Jenkins
