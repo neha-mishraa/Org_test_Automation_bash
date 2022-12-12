@@ -39,9 +39,9 @@ pipelines:
             - |
               [ ! -z "$res_S_Bash_0105_DistributionRule_sourceDistribution_id"  ]
             - |
-              [ ! -z "$es_S_Bash_0105_DistributionRule_sourceDistribution_user"  ]
+              [ ! -z "$res_S_Bash_0105_DistributionRule_sourceDistribution_user"  ]
             - |
-              [ ! -z "$es_S_Bash_0105_DistributionRule_operation"  ]
+              [ ! -z "$res_S_Bash_0105_DistributionRule_operation"  ]
             - |
               [ ! -z "$res_S_Bash_0105_DistributionRule_siteName"  ]
             - |
@@ -57,4 +57,4 @@ pipelines:
             - |
               [ ! -z "$res_S_Bash_0105_DistributionRule_integrationAlias"  ]
             - |
-              [ ! -z "$res_S_Bash_0105_DistributionRule_resourcePath"  ]  
+              [ ! -z "$res_S_Bash_0105_DistributionRule_resourcePath"  ]

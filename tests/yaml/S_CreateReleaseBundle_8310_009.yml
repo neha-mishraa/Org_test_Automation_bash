@@ -62,7 +62,7 @@ pipelines:
             - curlOptions="--silent --retry 3 -w %{http_code} -u $int_s_distribution_user:$int_s_distribution_apikey"
             - if [ "$no_verify_ssl" == "true" ]; then curlOptions+=" --insecure"; fi
             - "curl $curlOptions -H 'Content-Type: application/json' -XGET -L \"$int_s_distribution_url/api/v1/release_bundle/$releaseBundleName/$releaseBundleVersion\" --output $step_tmp_dir/response --dump-header $step_tmp_dir/response_header"
-            - "artifactSha=$(cat $step_tmp_dir/response_header | grep 'X-Checksum-Sha256: ' | awk '{print $2}' | tr -d '[:space:]')"
+            - "artifactSha=$(cat $step_tmp_dir/response_header | grep 'x-checksum-sha256: ' | awk '{print $2}' | tr -d '[:space:]')"
             - echo $artifactSha
             - artifactPath="${releaseBundleName}/${releaseBundleVersion}"
             - echo $artifactPath

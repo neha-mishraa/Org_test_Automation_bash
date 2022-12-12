@@ -11,12 +11,9 @@ pipelines:
                 language: node
                 versions:
                   - 10.21.0
-        execution:
-          onExecute:
-            - |
-              [[ "$(node --version)" == *"$step_image_tag"* ]]
           integrations:
             - name: BSI_AzureKey
         execution:
           onExecute:
-            - echo "executing step..."
+            - |
+              [[ "$(node --version)" == *"$step_image_tag"* ]]

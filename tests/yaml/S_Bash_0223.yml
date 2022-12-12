@@ -36,12 +36,10 @@ pipelines:
             - |
               [ ! -z "$res_S_Bash_0223_vmCluster_sshKey_masterName"  ]
             - |
-              [ ! -z "$es_S_Bash_0223_vmCluster_resourceId"  ]
+              [ ! -z "$res_S_Bash_0223_vmCluster_resourceId"  ]
             - |
               [ ! -z "$res_S_Bash_0223_vmCluster_sshKey_id"  ]
             - |
               [ ! -z "$res_S_Bash_0223_vmCluster_sshKey_publicKey"  ]
             - |
               [ ! -z "$res_S_Bash_0223_vmCluster_integrationAlias"  ]
-
-                             
