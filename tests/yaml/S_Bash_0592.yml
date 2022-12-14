@@ -5,7 +5,7 @@
         type: Bash
         configuration:
           integrations:
-            - name: BSI_pagerduty
+            - name: BSI_pagerduty_fakeToken
         execution:
           onExecute:
-            - send_notification BSI_pagerduty
+            - send_notification BSI_pagerduty_fakeToken
