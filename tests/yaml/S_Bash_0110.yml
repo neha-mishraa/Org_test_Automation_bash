@@ -2,7 +2,7 @@ resources:
   - name: S_Bash_0110_DistributionRule
     type: DistributionRule
     configuration:
-      sourceDistribution: i_distribution
+      sourceDistribution: BSR_distribution
       serviceName: svce
       siteName: "*"
       cityName: "*"
