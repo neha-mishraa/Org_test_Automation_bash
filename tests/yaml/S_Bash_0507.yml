@@ -2,7 +2,7 @@ resources:
   - name: S_Bash_0507_Image
     type: Image
     configuration:
-      registry: i_artifactoryRegistry
+      registry: s_artifactory
       sourceRepository: test-automation-docker-local
       imageName: ${artifactory_registry_url}/test-automation-docker-local/jfreq
       imageTag: latest
@@ -18,4 +18,33 @@ pipelines:
             - name: S_Bash_0507_Image
         execution:
           onExecute:
-            - printenv
+            - |
+              [ ! -z "$res_S_Bash_0507_Image_operation" ]
+            - |
+              [ ! -z "$res_S_Bash_0507_Image_isTrigger" ]
+            - |
+              [ ! -z "$res_S_Bash_0507_Image_integrationName" ]
+            - |
+              [ ! -z "$res_S_Bash_0507_Image_registry_masterName" ]
+            - |
+              [ ! -z "$res_S_Bash_0507_Image_resourceId" ]
+            - |
+              [ ! -z "$res_S_Bash_0507_Image_imageTag" ]
+            - |
+              [ ! -z "$res_S_Bash_0507_Image_registry_id" ]
+            - |
+              [ ! -z "$res_S_Bash_0507_Image_registry_name" ]
+            - |
+              [ ! -z "$res_S_Bash_0507_Image_integrationAlias" ]
+            - |
+              [ ! -z "$res_S_Bash_0507_Image_registry_user" ]
+            - |
+              [ ! -z "$res_S_Bash_0507_Image_registry_apikey" ]
+            - |
+              [ ! -z "$res_S_Bash_0507_Image_registry_url" ]
+            - |
+              [ ! -z "$res_S_Bash_0507_Image_region" ]
+            - |
+              [ ! -z "$res_S_Bash_0507_Image_resourcePath" ]
+            - |
+              [ ! -z "$res_S_Bash_0507_Image_imageName" ]
