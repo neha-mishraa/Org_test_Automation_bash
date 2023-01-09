@@ -10,6 +10,8 @@ pipelines:
     steps:
       - name: S_Bash_10641_0001_1
         type: Bash
+        configuration:
+          nodePool: u20k8sdynamic_10641
         execution:
           onExecute:
             - myOutput=`docker info --format "{{ "{{" }} json .{{ "}}" }}" | jq '.RegistryConfig.IndexConfigs."myinsecureregistry.com".Secure'`
