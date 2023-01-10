@@ -1,0 +1,12 @@
+name: parent
+description: invokes another task
+source: github.com/jfbetapipeorg/Org_test_Automation_bash
+input:
+  - name: taskPath
+    description: points to the nested task to invoke by absolute path
+execution:
+  - task: ${IN_taskPath}
+    id: parent-task
+    repository: test-automation-generic-local
+    input:
+      target: "parent execution"
