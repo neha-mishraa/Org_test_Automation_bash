@@ -1,0 +1,76 @@
+template: true
+valuesFilePath: ../values/gitRepoValues.yml
+
+resources:
+  - name: S_Bash_Tasks_9928_02_repo
+    type: GitRepo
+    configuration:
+      gitProvider: s_gitHub
+      path: {{ .Values.GitHub.Org_test_Automation_bash.path }}
+      branches:
+        include: {{ gitBranch }}
+
+pipelines:
+  - name: S_Bash_Tasks_9928_02_pipeline
+    configuration:
+      jfrogCliVersion: 2
+      affinityGroup: tasks
+      environmentVariables:
+        readOnly:
+          taskVersion: "v1.9928.${run_id}"
+    steps:
+      - name: S_Bash_Tasks_9928_02_step
+        type: Bash
+        configuration:
+          integrations:
+            - name: s_artifactory
+          inputResources:
+            - name: S_Bash_Tasks_9928_02_repo
+              trigger: false
+        execution:
+          onStart:
+            - mkdir -p "$step_tmp_dir/task"
+            - cp -r $(find_resource_variable S_Bash_Tasks_9928_02_repo resourcePath)/tests/tasks/hello/* $step_tmp_dir/task/
+            - pushd $step_tmp_dir/
+            - jf rt u "task/*" "test-automation-generic-local/jfrog/hello/${taskVersion}.zip" --archive zip
+            - popd
+            - rm -rf "$step_tmp_dir/task"
+            - mkdir -p "$step_tmp_dir/task"
+            - cp -r $(find_resource_variable S_Bash_Tasks_9928_02_repo resourcePath)/tests/tasks/parent/* $step_tmp_dir/task/
+            - pushd $step_tmp_dir/
+            - jf rt u "task/*" "test-automation-generic-local/jfrog/parent/${taskVersion}.zip" --archive zip
+            - popd
+            - rm -rf "$step_tmp_dir/task"
+
+          onExecute:
+            - task: jfrog/parent@${taskVersion}
+              repository: test-automation-generic-local
+              id: S_Bash_Tasks_9928_02_task
+              input:
+                taskPath: jfrog/hello@${taskVersion}
+            - end_step failure
+          onComplete:
+            - echo "on Complete"
+          onSuccess:
+            - echo "on Success"
+          onFailure:
+            - echo "on Failure"
+
+      - name: S_Bash_Tasks_9928_02_step_cleanup
+        type: Bash
+        configuration:
+          integrations:
+            - name: s_artifactory
+          inputSteps:
+            - name: S_Bash_Tasks_9928_02_step
+              status:
+                - failure
+                - error
+                - success
+                - skipped
+                - timeout
+        execution:
+          onExecute:
+            - jf rt del "test-automation-generic-local/jfrog/hello/${taskVersion}.zip" || true
+            - jf rt del "test-automation-generic-local/jfrog/parent/${taskVersion}.zip" || true
+

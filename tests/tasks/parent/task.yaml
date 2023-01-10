@@ -6,7 +6,15 @@ input:
     description: points to the nested task to invoke by absolute path
 execution:
   - task: ${IN_taskPath}
-    id: parent-task
+    id: nested-hello-task
     repository: test-automation-generic-local
     input:
       target: "parent execution"
+
+hooks:
+  onStepSuccess:
+    - echo "parent success"
+  onStepComplete:
+    - echo "parent complete"
+  onStepFailure:
+    - echo "parent failure"
