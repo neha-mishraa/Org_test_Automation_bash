@@ -2,7 +2,7 @@ template: true
 valuesFilePath: ../values/gitRepoValues.yml
 
 resources:
-  - name: S_GoPublishBinary_0024_GitRepo
+  - name: S_GoPublishBinary_0024_GitRepo_
     type: GitRepo
     configuration:
       gitProvider: s_gitHub_
@@ -11,13 +11,13 @@ resources:
         include: {{gitBranch}}
 
 pipelines:
-  - name: pipeline_S_GoPublishBinary_0024
+  - name: pipeline_S_GoPublishBinary_0024_
     steps:
       - name: S_GoPublishBinary_0024_1
         type: GoBuild
         configuration:
           inputResources:
-            - name: S_GoPublishBinary_0024_GitRepo
+            - name: S_GoPublishBinary_0024_GitRepo_
           integrations:
             - name: s_artifactory
           sourceLocation: "tests/Go/HelloWorld"
