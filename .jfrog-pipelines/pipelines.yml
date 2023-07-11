@@ -4,13 +4,16 @@ pipelines:
       - name: S_Bash_0426
         type: Bash
         configuration:
-          runtime:   
-            type: image
-            image: 
-              custom:
-                name: gcr.io/ship-rc/ubuntu
-                tag: latest 
-                registry: BSG_GCPkeys
+          integrations:
+            - name: BSG_GCPkeys
+          # runtime:   
+          #   type: image
+          #   image: 
+          #     custom:
+          #       name: gcr.io/ship-rc/ubuntu
+          #       tag: latest 
+          #       registry: BSG_GCPkeys
+  
         execution:
           onExecute:
             - echo "executing step..."
