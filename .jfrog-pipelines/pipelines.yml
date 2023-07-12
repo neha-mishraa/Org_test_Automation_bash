@@ -4,15 +4,13 @@ pipelines:
       - name: S_Bash_0426
         type: Bash
         configuration:
-          integrations:
-            - name: BSG_GCPkeys
-          # runtime:   
-          #   type: image
-          #   image: 
-          #     custom:
-          #       name: gcr.io/ship-rc/ubuntu
-          #       tag: latest 
-          #       registry: BSG_GCPkeys
+          runtime:   
+            type: image
+            image: 
+              custom:
+                name: gcr.io/pipelines-cloud-stg/ubuntu
+                tag: 20.04
+                registry: BSG_GCPkeys
   
         execution:
           onExecute:
