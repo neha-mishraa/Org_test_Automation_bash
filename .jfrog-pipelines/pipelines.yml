@@ -9,7 +9,7 @@ pipelines:
             image: 
               custom:
                 name: gcr.io/pipelines-cloud-stg/ubuntu
-                tag: 20.04
+                tag: '20.04'
                 registry: BSG_GCPkeys
   
         execution:
